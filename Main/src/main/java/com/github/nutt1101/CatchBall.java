@@ -3,6 +3,7 @@ package com.github.nutt1101;
 import java.util.logging.Level;
 
 
+import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.DropGoldEgg;
@@ -49,6 +50,8 @@ public class CatchBall extends JavaPlugin{
         plugin = this;
 
         ConfigSetting.checkConfig();
+
+        HandySchedulerUtil.init(this);
 
         new Metrics(this, 12380);
         registerEvent();
