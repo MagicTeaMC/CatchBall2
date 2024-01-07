@@ -4,18 +4,15 @@
   </center>
 </body>
 
-## Introduction:
-- [Spigot(English)](https://www.spigotmc.org/resources/catchball.94867/)
-- [巴哈姆特(ChineseTw)](https://forum.gamer.com.tw/C.php?bsn=18673&snA=192726&tnum=2&subbsn=14)
-
 ## Download:
-You can download a copy at [Hangar](https://hangar.papermc.io/Maoyue_OUO/CatchBall) or [Spigot](https://www.spigotmc.org/resources/catchball.94867/)
+You can download a copy at [Hangar](https://hangar.papermc.io/Maoyue_OUO/CatchBall)  
 
 ## Usage:
-[Wiki](https://github.com/NUTT1101/CatchBall/wiki)
+[Wiki](https://github.com/MagicTeaMC/CatchBall/wiki)
 
 ## Version:
 Now support:
+- 1.20.3/4
 - 1.20.2
 - 1.20(.1)
 - 1.19.4
