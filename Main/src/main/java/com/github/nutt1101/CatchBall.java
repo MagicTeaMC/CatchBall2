@@ -3,12 +3,15 @@ package com.github.nutt1101;
 import java.util.logging.Level;
 
 
+import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.DropGoldEgg;
 import com.github.nutt1101.event.GUIClick;
 import com.github.nutt1101.event.HitEvent;
 import com.github.nutt1101.event.SkullClick;
+import com.jeff_media.updatechecker.UpdateCheckSource;
+import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -48,9 +51,17 @@ public class CatchBall extends JavaPlugin{
 
         ConfigSetting.checkConfig();
 
+        HandySchedulerUtil.init(this);
+
         new Metrics(this, 12380);
         registerEvent();
         registerCommand();
+
+        new UpdateChecker(this, UpdateCheckSource.HANGAR, "Maoyue_OUO/CatchBall/Release")
+                .checkEveryXHours(1) // Check every hour
+                .setDownloadLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
+                .setChangelogLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
+                .checkNow(); // And check right now
 
         String serverVersion = getServer().getBukkitVersion();
 
