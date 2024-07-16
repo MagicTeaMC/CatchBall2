@@ -45,6 +45,7 @@ public class ConfigSetting {
     public static boolean UsePAPI;
     public static boolean UseMM;
     public static boolean UseRP;
+    public static boolean UseSCS;
 
     // TODO
     // public static boolean UseWG;
@@ -169,6 +170,9 @@ public class ConfigSetting {
 
         UseRP = !config.isSet("UseRP")
                 || config.getBoolean("UseRP");
+
+        UseSCS = !config.isSet("UseSCS")
+                || config.getBoolean("UseSCS");
 
         /*UseWG = !config.isSet("UseWG")
                 || config.getBoolean("UseWG");

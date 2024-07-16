@@ -81,6 +81,7 @@ public class CatchBall extends JavaPlugin{
             checkPluginHook("Lands");
             checkPluginHook("PlaceholderAPI");
             checkPluginHook("RedProtect");
+            checkPluginHook("SimpleClaimSystem");
             // TODO
             // checkPluginHook("WorldGuard");
         }

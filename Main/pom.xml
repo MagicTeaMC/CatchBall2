@@ -154,6 +154,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.Xyness</groupId>
+            <artifactId>SimpleClaimSystem</artifactId>
+            <version>1.10.0.2</version>
+        </dependency>
+
         <!--nms-->
         <dependency>
             <groupId>com.github.nutt1101</groupId>

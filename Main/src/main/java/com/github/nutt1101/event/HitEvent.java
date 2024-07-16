@@ -14,15 +14,14 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import fr.xyness.SCS.API.SimpleClaimSystemAPI;
+import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
 import me.angeschossen.lands.api.LandsIntegration;
 import me.angeschossen.lands.api.land.LandWorld;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -44,6 +43,7 @@ public class HitEvent implements Listener {
 
     LandsIntegration api;
     WorldGuardPlugin worldGuard;
+    private SimpleClaimSystemAPI scs;
     
     /* private final EntityType[] blockEntity = {EntityType.ARROW, EntityType.AREA_EFFECT_CLOUD, EntityType.MINECART_COMMAND, 
         EntityType.EGG, EntityType.DRAGON_FIREBALL, EntityType.ENDER_PEARL, EntityType.THROWN_EXP_BOTTLE , EntityType.EXPERIENCE_ORB,
@@ -56,6 +56,10 @@ public class HitEvent implements Listener {
 
         if(plugin.getServer().getPluginManager().getPlugin("Lands") != null) {
             api = LandsIntegration.of(plugin);
+        }
+
+        if(plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") != null) {
+            scs = SimpleClaimSystemAPI_Provider.getAPI();
         }
 
         // check if shooter is a player
@@ -113,6 +117,12 @@ public class HitEvent implements Listener {
                 }
 
                 if (!rpCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseRP) {
+                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
+                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
+                    return;
+                }
+
+                if (!scsCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseSCS) {
                     event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
                     player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
                     return;
@@ -312,6 +322,25 @@ public class HitEvent implements Listener {
         if (plugin.getServer().getPluginManager().getPlugin("RedProtect") == null) { return true; }
         Region r = RedProtect.get().getAPI().getRegion(player.getLocation());
         return r != null && r.canSpawnPassives(player);
+    }
+
+    public boolean scsCheck(Player player, Location location) {
+        if (plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") == null) { return true; }
+        fr.xyness.SCS.Claim claim = scs.getClaimAtChunk(getChunkFromLocation(location));
+        if (claim != null) {
+            if (claim.getPermission(player.getName())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Chunk getChunkFromLocation(Location location) {
+        int chunkX = location.getBlockX() >> 4;
+        int chunkZ = location.getBlockZ() >> 4;
+        return location.getWorld().getChunkAt(chunkX, chunkZ);
     }
 
     // TODO
