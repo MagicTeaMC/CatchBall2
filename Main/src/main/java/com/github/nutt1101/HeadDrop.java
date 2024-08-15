@@ -72,7 +72,7 @@ public class HeadDrop {
         }
 
         switch (CatchBall.getServerVersion()) {
-            case "1.21-R0.1-SNAPSHOT" -> headMeta = NBT_v1_21.saveEntityNBT(plugin, hitEntity, headMeta);
+            case "1.21-R0.1-SNAPSHOT", "1.21.1-R0.1-SNAPSHOT" -> headMeta = NBT_v1_21.saveEntityNBT(plugin, hitEntity, headMeta);
             case "1.20.5-R0.1-SNAPSHOT", "1.20.6-R0.1-SNAPSHOT" -> headMeta = NBT_v1_20_5.saveEntityNBT(plugin, hitEntity, headMeta);
             case "1.20.3-R0.1-SNAPSHOT", "1.20.4-R0.1-SNAPSHOT" -> headMeta = NBT_v1_20_3.saveEntityNBT(plugin, hitEntity, headMeta);
             case "1.20.2-R0.1-SNAPSHOT" -> headMeta = NBT_v1_20_2.saveEntityNBT(plugin, hitEntity, headMeta);
