@@ -297,25 +297,29 @@ public class HitEvent implements Listener {
     }
 
     public boolean gfCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("GriefPrevention") == null) { return true; }
+        if (plugin.getServer().getPluginManager().getPlugin("GriefPrevention") == null) {return true;}
 
-        if (GriefPrevention.instance.dataStore.getClaimAt(location, false, null) == null) { return true; }
-
-        Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
-
-        if (claim.getOwnerID().equals(player.getUniqueId()) || player.hasPermission("catchball.op") || player.isOp()) { return true; }
-
-        for (String flags : ConfigSetting.griefPreventionFlag) {
-            if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
-
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "").
-                        replace("{FLAG}", flags));
-
-                return false;
+            Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
+            if (claim == null) {
+                return true;
             }
-        }
 
-        return true;
+            java.util.UUID ownerId = claim.getOwnerID();
+            if ((ownerId != null && ownerId.equals(player.getUniqueId())) ||
+                    player.hasPermission("catchball.op") || player.isOp()) {
+                return true;
+            }
+
+            for (String flags : ConfigSetting.griefPreventionFlag) {
+                if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
+                    player.sendMessage(ConfigSetting.toChat(
+                                    TranslationFileReader.noResidencePermissions, "", "")
+                            .replace("{FLAG}", flags));
+
+                    return false;
+                }
+            }
+            return true;
     }
 
     public boolean rpCheck(Player player, Location location) {
