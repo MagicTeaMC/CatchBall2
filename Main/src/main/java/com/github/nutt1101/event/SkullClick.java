@@ -73,6 +73,7 @@ public class SkullClick implements Listener{
                         Entity entity = player.getWorld().spawnEntity(clickLocation, entityType);
                         
                         switch (CatchBall.getServerVersion()) {
+                            case "1.21.2-R0.1-SNAPSHOT", "1.21.3-R0.1-SNAPSHOT" -> NBT_v1_21_2.loadEntityNBT(plugin, entity, data);
                             case "1.21-R0.1-SNAPSHOT", "1.21.1-R0.1-SNAPSHOT" -> NBT_v1_21.loadEntityNBT(plugin, entity, data);
                             case "1.20.5-R0.1-SNAPSHOT", "1.20.6-R0.1-SNAPSHOT" -> NBT_v1_20_5.loadEntityNBT(plugin, entity, data);
                             case "1.20.3-R0.1-SNAPSHOT", "1.20.4-R0.1-SNAPSHOT" -> NBT_v1_20_3.loadEntityNBT(plugin, entity, data);

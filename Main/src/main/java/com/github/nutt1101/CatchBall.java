@@ -27,6 +27,8 @@ public class CatchBall extends JavaPlugin{
     public static Plugin plugin;
 
     private static final List<String> SUPPORTED_VERSIONS = Arrays.asList(
+            "1.21.3-R0.1-SNAPSHOT",
+            "1.21.2-R0.1-SNAPSHOT",
             "1.21.1-R0.1-SNAPSHOT",
             "1.21-R0.1-SNAPSHOT",
             "1.20.6-R0.1-SNAPSHOT",
