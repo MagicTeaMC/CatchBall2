@@ -1,24 +1,16 @@
 <body>
-  <center>
+  <div style="text-align: center;">
     <img src="https://github.com/NUTT1101/CatchBall/assets/95519633/320e05cc-55cf-4623-93e7-498578462ec9" alt="Plugin icon"width="150" height="150">
-  </center>
+  </div>
 </body>
 
+# CatchBall
+
 ## Download:
-You can download a copy at [Hangar](https://hangar.papermc.io/Maoyue_OUO/CatchBall)  
+You can download a copy at [Modrinth](https://modrinth.com/plugin/catchball)  
 
 ## Usage:
-[Wiki](https://github.com/MagicTeaMC/CatchBall/wiki)
-
-## Version:
-Now support:
-- 1.20.3/4
-- 1.20.2
-- 1.20(.1)
-- 1.19.4
-- 1.18.2
-- 1.17.1
-- 1.16.5
+[Wiki](https://github.com/MagicTeaMC/CatchBall2/wiki)
 
 ## Support plugins:
 - Residence
