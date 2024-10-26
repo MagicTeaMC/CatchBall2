@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.0.0"
+version = "2.0.1"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_16
 
