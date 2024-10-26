@@ -36,7 +36,7 @@ public class GUIClick implements Listener{
 
             if (event.getClickedInventory().equals(player.getInventory())) { return; }
             Integer page = Integer.valueOf(ChatColor.stripColor(event.getClickedInventory().getItem(49).getItemMeta().getDisplayName()
-                    .replace(" ", "").split(Pattern.quote(":") + "|" + Pattern.quote("："))[1]));
+                    .replace(" ", "").split(Pattern.quote(":") + "|" + Pattern.quote("\uff1a"))[1]));
 
 
             switch (event.getSlot()) {

@@ -116,9 +116,9 @@ public class TranslationFileReader {
                successRemove = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("SuccessRemove", "&aSuccessfully removed from the catchable list &b{ENTITY}"));
                skullDoesNotFound = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("SkullDoesNotFound", "&cThe data stored in the skull is missing"));
                locationUnsafe = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("LocationUnsafe", "&cCould not find a safe area to spawn, so this request has been cancelled"));
-               noResidencePermissions = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("NoResidencePermissions", "&cYou can’t spawn entity here because you are lacking {FLAG} permission for this residense"));
+               noResidencePermissions = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("NoResidencePermissions", "&cYou cannot spawn entity here because you are lacking {FLAG} permission for this residense"));
                allowCatchMessage = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("AllowCatchMessage", "&b{ENTITY} &6allow catch: {STATUS} !"));
-               allEntityAddSuccess = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("AllEntityAddSuccess", "&aAll Entity added success成功！"));
+               allEntityAddSuccess = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("AllEntityAddSuccess", "&aAll Entity added success!"));
                allEntityRemoveSuccess = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("AllEntityRemoveSuccess", "&eAll Entity removed success!"));
                playerNotExist = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("PlayerNotExist", "&cPlease enter a player that want to give the item!"));
                unknownOrOfflinePlayer = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("UnknownOrOfflinePlayer", "&cPlayer {PLAYER} not find!"));
@@ -163,9 +163,9 @@ public class TranslationFileReader {
                successRemove = localeYamlConfig.getString("SuccessRemove", "&aSuccessfully removed from the catchable list &b{ENTITY}");
                skullDoesNotFound = localeYamlConfig.getString("SkullDoesNotFound", "&cThe data stored in the skull is missing");
                locationUnsafe = localeYamlConfig.getString("LocationUnsafe", "&cCould not find a safe area to spawn, so this request has been cancelled");
-               noResidencePermissions = localeYamlConfig.getString("NoResidencePermissions", "&cYou can’t spawn entity here because you are lacking {FLAG} permission for this residense");
+               noResidencePermissions = localeYamlConfig.getString("NoResidencePermissions", "&cYou cannot spawn entity here because you are lacking {FLAG} permission for this residense");
                allowCatchMessage = localeYamlConfig.getString("AllowCatchMessage", "&b{ENTITY} &6allow catch: {STATUS} !");
-               allEntityAddSuccess = localeYamlConfig.getString("AllEntityAddSuccess", "&aAll Entity added success成功！");
+               allEntityAddSuccess = localeYamlConfig.getString("AllEntityAddSuccess", "&aAll Entity added success!");
                allEntityRemoveSuccess = localeYamlConfig.getString("AllEntityRemoveSuccess", "&eAll Entity removed success!");
                playerNotExist = localeYamlConfig.getString("PlayerNotExist", "&cPlease enter a player that want to give the item!");
                unknownOrOfflinePlayer = localeYamlConfig.getString("UnknownOrOfflinePlayer", "&cPlayer {PLAYER} not find!");

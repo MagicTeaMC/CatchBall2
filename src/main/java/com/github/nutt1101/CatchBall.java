@@ -2,7 +2,6 @@ package com.github.nutt1101;
 
 import java.util.logging.Level;
 
-
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
@@ -39,8 +38,6 @@ public class CatchBall extends JavaPlugin{
 
         ConfigSetting.checkConfig();
 
-        HandySchedulerUtil.init(this);
-
         new Metrics(this, 12380);
         registerEvent();
         registerCommand();
@@ -60,6 +57,8 @@ public class CatchBall extends JavaPlugin{
         checkPluginHook("SimpleClaimSystem");
         // TODO
         // checkPluginHook("WorldGuard");
+
+        HandySchedulerUtil.init(this);
 
     }
 
