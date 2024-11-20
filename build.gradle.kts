@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.0.1"
+version = "2.0.2"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_16
 
@@ -55,9 +55,9 @@ repositories {
 }
 
 dependencies {
-    api("org.bstats:bstats-bukkit:3.0.3")
+    api("org.bstats:bstats-bukkit:3.1.0")
     api("com.github.Paulem79:Spigot-UpdateChecker:3cfb265fb8")
-    api("de.tr7zw:item-nbt-api:2.13.3-SNAPSHOT")
+    api("de.tr7zw:item-nbt-api:2.14.0")
     api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.7.1")
@@ -111,7 +111,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.1")
+    minecraftVersion("1.21.3")
 }
 
 runPaper.folia.registerTask()
