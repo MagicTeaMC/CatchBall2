@@ -64,7 +64,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.12")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.github.angeschossen:LandsAPI:7.8.5")
-    implementation("com.github.Xyness:SimpleClaimSystem:1.11") {
+    implementation("com.github.Xyness:SimpleClaimSystem:1.11.6.2") {
         attributes {
             attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 22)
         }
