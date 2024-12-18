@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     kotlin("jvm") version "1.8.0"
     id("com.gradleup.shadow") version "8.3.5"
-    id("xyz.jpenilla.run-paper") version "2.2.4"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.github.nutt1101"
