@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.0.2"
+version = "2.0.3"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -57,7 +57,7 @@ repositories {
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("com.github.Paulem79:Spigot-UpdateChecker:3cfb265fb8")
-    api("de.tr7zw:item-nbt-api:2.14.1-SNAPSHOT")
+    api("de.tr7zw:item-nbt-api:2.14.1")
     api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.7.1")
