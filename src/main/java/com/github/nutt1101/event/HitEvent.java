@@ -333,11 +333,7 @@ public class HitEvent implements Listener {
         if (plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") == null) { return true; }
         fr.xyness.SCS.Claim claim = scs.getClaimAtChunk(getChunkFromLocation(location));
         if (claim != null) {
-            if (claim.getPermission(player.getName())) {
-                return true;
-            } else {
-                return false;
-            }
+            return claim.getPermission(player.getName(), null);
         }
         return true;
     }
