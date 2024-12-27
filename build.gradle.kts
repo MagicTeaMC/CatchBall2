@@ -64,11 +64,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.12")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.github.angeschossen:LandsAPI:7.8.5")
-    implementation("com.github.Xyness:SimpleClaimSystem:1.11") {
-        attributes {
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 22)
-        }
-    }
+    compileOnly(files("./libs/SimpleClaimSystem-1.11.6.2.jar"))
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
@@ -115,7 +111,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.3")
+    minecraftVersion("1.21.4")
 }
 
 runPaper.folia.registerTask()
