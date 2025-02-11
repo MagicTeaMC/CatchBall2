@@ -1,17 +1,12 @@
 package com.github.nutt1101.event;
 
-import java.util.Random;
-
 import com.github.nutt1101.ConfigSetting;
-
 import com.github.nutt1101.items.GoldEgg;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityDropItemEvent;
+
+import java.util.Random;
 
 
 public class EntityDrop implements Listener{

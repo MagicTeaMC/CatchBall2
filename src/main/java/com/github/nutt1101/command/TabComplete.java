@@ -1,11 +1,5 @@
 package com.github.nutt1101.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-
 import com.github.nutt1101.ConfigSetting;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,6 +7,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class TabComplete implements TabCompleter {
     List<String> entityList = new ArrayList<>();

@@ -1,13 +1,12 @@
 package com.github.nutt1101.command;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.github.nutt1101.ConfigSetting;
-
 import com.github.nutt1101.utils.TranslationFileReader;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class CommandCheck {
     private static List<String> argmumentList = Arrays.asList("reload", "list", "add", "remove", "give");

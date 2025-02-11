@@ -1,9 +1,5 @@
 package com.github.nutt1101.Recipe;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
-
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
@@ -15,6 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class BallRecipe {

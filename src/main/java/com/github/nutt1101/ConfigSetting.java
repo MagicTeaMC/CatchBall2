@@ -1,14 +1,9 @@
 package com.github.nutt1101;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
 import com.bekvon.bukkit.residence.containers.Flags;
-
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
+import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,7 +11,16 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;

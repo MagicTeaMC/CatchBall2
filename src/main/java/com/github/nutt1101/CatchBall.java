@@ -1,7 +1,5 @@
 package com.github.nutt1101;
 
-import java.util.logging.Level;
-
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
@@ -14,6 +12,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.logging.Level;
 
 public class CatchBall extends JavaPlugin{
     private FileConfiguration config = this.getConfig();

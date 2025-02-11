@@ -1,17 +1,15 @@
 package com.github.nutt1101.items;
 
-import java.util.stream.Collectors;
-
 import com.github.nutt1101.ConfigSetting;
-
 import com.github.nutt1101.utils.TranslationFileReader;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.stream.Collectors;
 
 public class GoldEgg {
 

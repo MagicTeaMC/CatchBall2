@@ -5,16 +5,13 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.github.nutt1101.*;
+import com.github.nutt1101.CatchBall;
+import com.github.nutt1101.ConfigSetting;
+import com.github.nutt1101.HeadDrop;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.StateFlag;
 import fr.xyness.SCS.API.SimpleClaimSystemAPI;
 import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
 import me.angeschossen.lands.api.LandsIntegration;
@@ -33,7 +30,6 @@ import org.bukkit.projectiles.BlockProjectileSource;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
 
 
 public class HitEvent implements Listener {
