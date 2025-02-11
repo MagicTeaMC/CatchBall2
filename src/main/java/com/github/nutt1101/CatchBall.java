@@ -5,10 +5,7 @@ import java.util.logging.Level;
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
-import com.github.nutt1101.event.DropGoldEgg;
-import com.github.nutt1101.event.GUIClick;
-import com.github.nutt1101.event.HitEvent;
-import com.github.nutt1101.event.SkullClick;
+import com.github.nutt1101.event.*;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
@@ -17,8 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import java.util.Arrays;
-import java.util.List;
 
 public class CatchBall extends JavaPlugin{
     private FileConfiguration config = this.getConfig();
@@ -66,7 +61,11 @@ public class CatchBall extends JavaPlugin{
     public void registerEvent() {
         PluginManager registerEvent = this.getServer().getPluginManager();
         registerEvent.registerEvents(new HitEvent(), this);
-        registerEvent.registerEvents(new DropGoldEgg(), this);
+        if (ConfigSetting.DropEnable) {
+            registerEvent.registerEvents(new EntityDrop(), this);
+            registerEvent.registerEvents(new BlockDrop(), this);
+            registerEvent.registerEvents(new ChickenDrop(), this);
+        }
         registerEvent.registerEvents(new SkullClick(), this);
         registerEvent.registerEvents(new GUIClick(), this);
     }

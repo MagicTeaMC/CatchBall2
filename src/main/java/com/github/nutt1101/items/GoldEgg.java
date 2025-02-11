@@ -25,7 +25,7 @@ public class GoldEgg {
 
         meta.setLore(TranslationFileReader.goldEggLore.stream().map(lore -> ChatColor.
                 translateAlternateColorCodes('&', lore).replace("{PERCENT}", String.valueOf(ConfigSetting.
-                        chickenDropGoldEggChance))).collect(Collectors.toList()));
+                        DropGoldEggChance))).collect(Collectors.toList()));
 
         goldEgg.setItemMeta(meta);
 
