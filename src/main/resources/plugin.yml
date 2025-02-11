@@ -11,7 +11,7 @@ permissions:
   catchball.use:
     default: true
   catchball.get.entity:
-      default: false
+    default: false
   catchball.get.block:
     default: false
 commands:
