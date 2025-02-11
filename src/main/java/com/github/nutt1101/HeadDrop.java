@@ -1,18 +1,9 @@
 package com.github.nutt1101;
 
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
 import com.github.nutt1101.event.HitEvent;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -28,7 +19,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
 
-import net.md_5.bungee.api.ChatColor;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class HeadDrop {
     private final Plugin plugin = CatchBall.plugin;

@@ -8,11 +8,20 @@
 # https://crowdin.com/project/catchball
 Locale: en
 
-# Whether the chickens will drop the "GoldEgg" (true/false)
-ChickenDropGoldEgg: true
-
-# Chance of chicken to drop GoldEgg
-ChickenDropGoldEggChance: 50%
+# Enable or disable drop goldegg feature (This switch requires a server restart to take effect)
+DropEnable: true
+# Drop goldegg need permission (only works entity/block drop)
+DropNeedPermission: false
+# Drop GoldEgg chance
+DropGoldEggChance: 50%
+# Can drop goldegg method (CHICKEN/ENTITY/BLOCK)
+# CHICKEN: Chicken lays eggs
+# ENTITY: Entity death
+# BLOCK: Block break (Non-creative mode)
+DropMethod: CHICKEN
+# Drop entity or block type
+DropEntityType: CHICKEN
+DropBlockType: DIAMOND_ORE
 
 # Captured sound effects, No sound to type (false)
 # Sound Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html

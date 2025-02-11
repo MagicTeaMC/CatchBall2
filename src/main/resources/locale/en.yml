@@ -62,7 +62,7 @@ Items:
   GoldEgg:
     DisplayName: "&6GoldEgg"
     Lore:
-      - "&7Chickens have a &e{PERCENT}% &7chance of them lay GOLDEGG"
+      - "&7When destroying blocks, killing creatures, or laying eggs, there is a &e{PERCENT}%&7 chance of dropping"
       - "&7Can be used with CraftRecipe to make CatchBall"
 
 #The lore of the Catch List GUI

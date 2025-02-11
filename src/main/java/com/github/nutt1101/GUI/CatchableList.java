@@ -1,8 +1,9 @@
 package com.github.nutt1101.GUI;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.github.nutt1101.ConfigSetting;
+import com.github.nutt1101.HeadDrop;
+import com.github.nutt1101.utils.TranslationFileReader;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,10 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import net.md_5.bungee.api.ChatColor;
-import com.github.nutt1101.ConfigSetting;
-import com.github.nutt1101.HeadDrop;
-import com.github.nutt1101.utils.TranslationFileReader;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class CatchableList {
     private List<ItemStack> head = new ArrayList<>();  // Consider making it private to maintain encapsulation

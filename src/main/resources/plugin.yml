@@ -10,8 +10,11 @@ permissions:
     default: op
   catchball.use:
     default: true
+  catchball.get.entity:
+    default: false
+  catchball.get.block:
+    default: false
 commands:
   ctb:
     description: "Command Help : /ctb"
 folia-supported: true
-    

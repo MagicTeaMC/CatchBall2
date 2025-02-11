@@ -2,11 +2,14 @@ package com.github.nutt1101.utils;
 
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import me.clip.placeholderapi.PlaceholderAPI;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -48,7 +48,7 @@ Items:
   GoldEgg:
     DisplayName: "&6金蛋"
     Lore:
-      - "&7鸡在生蛋时会有 &e{PERCENT}% &7 概率生出"
+      - "&7破坏方块,杀生物,鸡生蛋时会有 &e{PERCENT}% &7 概率掉落"
       - "&7可用于合成捕获球"
 #The lore of the Catch List GUI
 DropSkullLore:
