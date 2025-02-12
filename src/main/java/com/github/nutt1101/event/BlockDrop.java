@@ -1,7 +1,7 @@
 package com.github.nutt1101.event;
 
 import com.github.nutt1101.ConfigSetting;
-import com.github.nutt1101.items.GoldEgg;
+import com.github.nutt1101.items.DropItem;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,12 +31,12 @@ public class BlockDrop implements Listener {
             return;
         }
 
-        ConfigSetting.DropGoldEggChance = Math.min(ConfigSetting.DropGoldEggChance, 100);
+        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
 
         if (event.getBlock().getType() == ConfigSetting.DropBlockType) {
-            if (chance.nextInt(99) < ConfigSetting.DropGoldEggChance) {
+            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
                 event.setDropItems(false);
-                event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), GoldEgg.makeGoldEgg());
+                event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), DropItem.makeDropItem());
             }
         }
     }

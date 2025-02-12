@@ -8,13 +8,15 @@
 # https://crowdin.com/project/catchball
 Locale: en
 
-# Enable or disable drop goldegg feature (This switch requires a server restart to take effect)
+# Enable or disable drop item feature (This switch requires a server restart to take effect)
 DropEnable: true
-# Drop goldegg need permission (only works entity/block drop)
+# Drop Item need permission (only works entity/block drop)
 DropNeedPermission: false
-# Drop GoldEgg chance
-DropGoldEggChance: 50%
-# Can drop goldegg method (CHICKEN/ENTITY/BLOCK)
+# Drop Item chance
+DropItemChance: 50%
+# Drop Item Material
+DropItemMaterial: EGG
+# Can drop item method (CHICKEN/ENTITY/BLOCK)
 # CHICKEN: Chicken lays eggs
 # ENTITY: Entity death
 # BLOCK: Block break (Non-creative mode)
@@ -49,14 +51,14 @@ Recipe:
     enabled: true
     # Recipe key
     key:
-        # GOLDEGG is the plugin provided custom item
+        # DROPITEM is the plugin provided custom item
         # Item Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/material/package-summary.html
-        G: GOLDEGG
+        I: DROPITEM
     # Recipe
     shape:
-        - "GGG"
-        - "GGG"
-        - "GGG"
+        - "III"
+        - "III"
+        - "III"
 
 # Disable if you don't want CatchBall check Residence flag
 UseRes: true

@@ -63,7 +63,7 @@ public class TabComplete implements TabCompleter {
                 }
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("give")) {
-                    StringUtil.copyPartialMatches(args[2], Arrays.asList("CatchBall", "GoldEgg"), sort);
+                    StringUtil.copyPartialMatches(args[2], Arrays.asList("CatchBall", "DropItem"), sort);
                     return sort;
                 }
             } else if (args.length == 4) {

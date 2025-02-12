@@ -32,7 +32,8 @@ public class ConfigSetting {
     public static DropMethodType DropMethod;
     public static EntityType DropEntityType;
     public static Material DropBlockType;
-    public static int DropGoldEggChance;
+    public static int DropItemChance;
+    public static Material DropItemMaterial;
     public static String catchSuccessSound;
     public static YamlConfiguration entityFile;
     public static boolean recipeEnabled;
@@ -73,9 +74,16 @@ public class ConfigSetting {
 
         DropEnable = !config.isSet("DropEnable") || config.getBoolean("DropEnable");
         DropNeedPermission = config.isSet("DropNeedPermission") && config.getBoolean("DropNeedPermission");
-        DropGoldEggChance = config.isSet("DropGoldEggChance")
-                ? Integer.parseInt(config.getString("DropGoldEggChance").replace("%", ""))
+        DropItemChance = config.isSet("DropItemChance")
+                ? Integer.parseInt(config.getString("DropItemChance").replace("%", ""))
                 : 50;
+        try {
+            DropItemMaterial = config.isSet("DropItemMaterial") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropItemMaterial"))) : Material.EGG;
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
+            DropItemMaterial = Material.EGG;
+        }
+
         try {
             DropMethod = config.isSet("DropMethod") ? DropMethodType.valueOf(config.getString("DropMethod").toUpperCase()) : DropMethodType.CHICKEN;
         } catch (IllegalArgumentException e) {

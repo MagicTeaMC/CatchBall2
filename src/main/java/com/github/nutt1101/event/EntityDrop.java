@@ -1,7 +1,7 @@
 package com.github.nutt1101.event;
 
 import com.github.nutt1101.ConfigSetting;
-import com.github.nutt1101.items.GoldEgg;
+import com.github.nutt1101.items.DropItem;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -30,11 +30,11 @@ public class EntityDrop implements Listener{
             }
         }
 
-        ConfigSetting.DropGoldEggChance = Math.min(ConfigSetting.DropGoldEggChance, 100);
+        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
         if (event.getEntityType().equals(ConfigSetting.DropEntityType)) {
-            if (chance.nextInt(99) < ConfigSetting.DropGoldEggChance) {
+            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
                 event.getDrops().clear();
-                event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), GoldEgg.makeGoldEgg());
+                event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), DropItem.makeDropItem());
             }
         }
     }

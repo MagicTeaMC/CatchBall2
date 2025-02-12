@@ -3,7 +3,7 @@ package com.github.nutt1101.Recipe;
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
-import com.github.nutt1101.items.GoldEgg;
+import com.github.nutt1101.items.DropItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -36,8 +36,8 @@ public class BallRecipe {
             for (String key : recipePath) {
                 String ItemName = config.getString("Recipe.key." + key).toUpperCase();
                 if (ItemName instanceof String) {
-                    if (ItemName.equals("GOLDEGG")) {
-                        ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.ExactChoice(GoldEgg.makeGoldEgg()));
+                    if (ItemName.equals("DROPITEM")) {
+                        ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
                     } else {
                         ballRecipe.setIngredient(key.charAt(0), Material.valueOf(ItemName));
                     }

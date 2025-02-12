@@ -3,7 +3,7 @@ package com.github.nutt1101.command;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.GUI.CatchableList;
 import com.github.nutt1101.items.Ball;
-import com.github.nutt1101.items.GoldEgg;
+import com.github.nutt1101.items.DropItem;
 import com.github.nutt1101.utils.TranslationFileReader;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -141,7 +141,7 @@ public class Command implements CommandExecutor {
 
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
                         .replace("{ITEM}", args[2].toLowerCase().equals("catchball") ? TranslationFileReader.catchBallName
-                                : TranslationFileReader.goldEggName)
+                                : TranslationFileReader.dropItemName)
                         .replace("{PLAYER}", player.getName())
                         .replace("&", "§"));
 
@@ -163,8 +163,8 @@ public class Command implements CommandExecutor {
         if (item.equals("catchball")) {
             return Ball.makeBall();
         }
-        if (item.equals("goldegg")) {
-            return GoldEgg.makeGoldEgg();
+        if (item.equals("dropitem")) {
+            return DropItem.makeDropItem();
         }
         return null;
     }

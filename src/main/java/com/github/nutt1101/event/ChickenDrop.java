@@ -1,7 +1,7 @@
 package com.github.nutt1101.event;
 
 import com.github.nutt1101.ConfigSetting;
-import com.github.nutt1101.items.GoldEgg;
+import com.github.nutt1101.items.DropItem;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -20,12 +20,12 @@ public class ChickenDrop implements Listener {
         if (ConfigSetting.DropMethod != ConfigSetting.DropMethodType.CHICKEN) { return; }
         if (!event.getItemDrop().getItemStack().equals(new ItemStack(Material.EGG))) { return; }
 
-        ConfigSetting.DropGoldEggChance = Math.min(ConfigSetting.DropGoldEggChance, 100);
+        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
 
         if (event.getEntityType().equals(chicken)) {
-            if (chance.nextInt(99) < ConfigSetting.DropGoldEggChance) {
+            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
                 event.setCancelled(true);
-                event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), GoldEgg.makeGoldEgg());
+                event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), DropItem.makeDropItem());
             }
         }
     }
