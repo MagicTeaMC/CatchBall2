@@ -13,6 +13,7 @@ DropEnable: true
 # Drop Item need permission (only works entity/block drop)
 DropNeedPermission: false
 # Drop Item chance
+# Warning: Changing this may cause previously dropped items to not be craftable into catchball
 DropItemChance: 50%
 # Drop Item Material
 DropItemMaterial: EGG
