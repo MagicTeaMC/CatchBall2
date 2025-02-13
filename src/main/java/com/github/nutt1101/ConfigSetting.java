@@ -1,33 +1,39 @@
 package com.github.nutt1101;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
 import com.bekvon.bukkit.residence.containers.Flags;
-
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
+import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;
     public static String locale;
     public static boolean updatecheck;
     public static List<EntityType> catchableEntity = new ArrayList<>();
-    public static boolean chickenDropGoldEgg;
-    public static int chickenDropGoldEggChance;
+    public static boolean DropEnable;
+    public static boolean DropNeedPermission;
+    public static DropMethodType DropMethod;
+    public static EntityType DropEntityType;
+    public static Material DropBlockType;
+    public static int DropItemChance;
+    public static Material DropItemMaterial;
     public static String catchSuccessSound;
     public static YamlConfiguration entityFile;
     public static boolean recipeEnabled;
@@ -66,15 +72,30 @@ public class ConfigSetting {
 
         entityFileCreate();
 
-        chickenDropGoldEgg = !config.isSet("ChickenDropGoldEgg") || config.getBoolean("ChickenDropGoldEgg");
+        DropEnable = !config.isSet("DropEnable") || config.getBoolean("DropEnable");
+        DropNeedPermission = config.isSet("DropNeedPermission") && config.getBoolean("DropNeedPermission");
+        DropItemChance = config.isSet("DropItemChance")
+                ? Integer.parseInt(config.getString("DropItemChance").replace("%", ""))
+                : 50;
+        try {
+            DropItemMaterial = config.isSet("DropItemMaterial") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropItemMaterial"))) : Material.EGG;
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
+            DropItemMaterial = Material.EGG;
+        }
+
+        try {
+            DropMethod = config.isSet("DropMethod") ? DropMethodType.valueOf(config.getString("DropMethod").toUpperCase()) : DropMethodType.CHICKEN;
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
+            DropMethod = DropMethodType.CHICKEN;
+        }
+        DropEntityType = config.isSet("DropEntityType") ? EntityType.valueOf(config.getString("DropEntityType")) : EntityType.CHICKEN;
+        DropBlockType = config.isSet("DropBlockType") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropBlockType"))) : Material.DIAMOND_ORE;
 
         updatecheck = !config.isSet("Update-Check") || config.getBoolean("Update-Check");
 
         entityFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "entity.yml"));
-
-        chickenDropGoldEggChance = config.isSet("ChickenDropGoldEggChance")
-                ? Integer.parseInt(config.getString("ChickenDropGoldEggChance").replace("%", ""))
-                : 50;
 
         catchSuccessSound = config.isSet("CatchSuccessSound") ? config.getString("CatchSuccessSound").toUpperCase()
                 : "ENTITY_ARROW_HIT_PLAYER".toUpperCase();
@@ -92,7 +113,7 @@ public class ConfigSetting {
                 || config.getBoolean("ShowParticles");
         CustomParticles = config.isSet("CustomParticles") ? config.getString("CustomParticles") : "CLOUD";
         catchFailRate = !config.isSet("catchFailRate") ? config.getDouble("catchFailRate")
-        : 0.1;
+                : 0.1;
 
         try {
             TranslationFileReader.init();
@@ -268,5 +289,11 @@ public class ConfigSetting {
             if (currentPart > latestPart) return true;
         }
         return currentParts.length >= latestParts.length;
+    }
+
+    public enum DropMethodType {
+        CHICKEN,
+        ENTITY,
+        BLOCK
     }
 }

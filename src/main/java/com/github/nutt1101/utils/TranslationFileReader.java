@@ -2,11 +2,14 @@ package com.github.nutt1101.utils;
 
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import me.clip.placeholderapi.PlaceholderAPI;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,14 +51,14 @@ public class TranslationFileReader {
      public static String currentPage;
      public static String catchBallName;
      public static List<String> catchBallLore = new ArrayList<>();
-     public static String goldEggName;
-     public static List<String> goldEggLore = new ArrayList<>();
+     public static String dropItemName;
+     public static List<String> dropItemLore = new ArrayList<>();
      public static List<String> dropSkullLore = new ArrayList<>();
      public static List<String> guiSkullLore = new ArrayList<>();
      public static YamlConfiguration localeYamlConfig;
-    public static String catchFail;
+     public static String catchFail;
 
-    public static void init() throws IOException {
+     public static void init() throws IOException {
           prepareLocaleYamlConfig();
           load();
      }
@@ -105,8 +108,8 @@ public class TranslationFileReader {
                ballHitBlock = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("BallHitBlock", "&cYou did not hit a entity,So {BALL} fell in {LOCATION}"));
                noPermissionToUse = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("NoPermissionToUse", "&cYou don't have permission to use {BALL}, so {BALL} &cfell in &e{LOCATION}."));
                catchSuccess = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("CatchSuccess", "&aSuccessfully captured {ENTITY} location: {LOCATION}"));
-               itemDoesNotExist = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("ItemDoesNotExist", "&cPlease enter the item to be picked up  &7CatchBall | GoldEgg"));
-               itemNameError = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("ItemNameError", "&cPlease enter the correct item name  &7CatchBall | GoldEgg"));
+               itemDoesNotExist = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("ItemDoesNotExist", "&cPlease enter the item to be picked up  &7CatchBall | DropItem"));
+               itemNameError = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("ItemNameError", "&cPlease enter the correct item name  &7CatchBall | DropItem"));
                addEntityDoesNotExist = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("AddEntityDoesNotExist", "&cPlease enter the name of the entity to be added to the list of captured creatures!"));
                unknownEntityType = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("UnknownEntityType", "&cUnknown entity type!"));
                entityDoesExists = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("EntityDoesExists", "&cThe entity already exists in the catchable list!"));
@@ -131,8 +134,8 @@ public class TranslationFileReader {
                catchBallName = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("Items.CatchBall.DisplayName", "&aCat&bch &cball"));
 
                catchBallLore = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getStringList("Items.CatchBall.Lore"));
-               goldEggName = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("Items.GoldEgg.DisplayName", "&6GoldEgg"));
-               goldEggLore = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getStringList("Items.GoldEgg.Lore"));
+               dropItemName = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getString("Items.DropItem.DisplayName", "&6GoldEgg"));
+               dropItemLore = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getStringList("Items.DropItem.Lore"));
                dropSkullLore = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getStringList("DropSkullLore"));
                guiSkullLore = PlaceholderAPI.setPlaceholders(null, localeYamlConfig.getStringList("guiSkullLore"));
 
@@ -152,8 +155,8 @@ public class TranslationFileReader {
                ballHitBlock = localeYamlConfig.getString("BallHitBlock", "&cYou did not hit a entity,So {BALL} fell in {LOCATION}");
                noPermissionToUse = localeYamlConfig.getString("NoPermissionToUse", "&cYou don't have permission to use {BALL}, so {BALL} &cfell in &e{LOCATION}.");
                catchSuccess = localeYamlConfig.getString("CatchSuccess", "&aSuccessfully captured {ENTITY} location: {LOCATION}");
-               itemDoesNotExist = localeYamlConfig.getString("ItemDoesNotExist", "&cPlease enter the item to be picked up  &7CatchBall | GoldEgg");
-               itemNameError = localeYamlConfig.getString("ItemNameError", "&cPlease enter the correct item name  &7CatchBall | GoldEgg");
+               itemDoesNotExist = localeYamlConfig.getString("ItemDoesNotExist", "&cPlease enter the item to be picked up  &7CatchBall | DropItem");
+               itemNameError = localeYamlConfig.getString("ItemNameError", "&cPlease enter the correct item name  &7CatchBall | DropItem");
                addEntityDoesNotExist = localeYamlConfig.getString("AddEntityDoesNotExist", "&cPlease enter the name of the entity to be added to the list of captured creatures!");
                unknownEntityType = localeYamlConfig.getString("UnknownEntityType", "&cUnknown entity type!");
                entityDoesExists = localeYamlConfig.getString("EntityDoesExists", "&cThe entity already exists in the catchable list!");
@@ -178,8 +181,8 @@ public class TranslationFileReader {
                catchBallName = localeYamlConfig.getString("Items.CatchBall.DisplayName", "&aCat&bch &cball");
 
                catchBallLore = localeYamlConfig.getStringList("Items.CatchBall.Lore");
-               goldEggName = localeYamlConfig.getString("Items.GoldEgg.DisplayName", "&6GoldEgg");
-               goldEggLore = localeYamlConfig.getStringList("Items.GoldEgg.Lore");
+               dropItemName = localeYamlConfig.getString("Items.DropItem.DisplayName", "&6GoldEgg");
+               dropItemLore = localeYamlConfig.getStringList("Items.DropItem.Lore");
                dropSkullLore = localeYamlConfig.getStringList("DropSkullLore");
                guiSkullLore = localeYamlConfig.getStringList("guiSkullLore");
 

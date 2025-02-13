@@ -1,8 +1,8 @@
 package com.github.nutt1101.event;
 
-import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import cn.handyplus.lib.adapter.PlayerSchedulerUtil;
-import com.github.nutt1101.*;
+import com.github.nutt1101.CatchBall;
+import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
 import org.bukkit.Location;
@@ -20,8 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-
-import java.util.logging.Level;
 
 public class SkullClick implements Listener{
     private final Plugin plugin = CatchBall.plugin;

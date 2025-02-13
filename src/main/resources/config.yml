@@ -8,11 +8,23 @@
 # https://crowdin.com/project/catchball
 Locale: en
 
-# Whether the chickens will drop the "GoldEgg" (true/false)
-ChickenDropGoldEgg: true
-
-# Chance of chicken to drop GoldEgg
-ChickenDropGoldEggChance: 50%
+# Enable or disable drop item feature (This switch requires a server restart to take effect)
+DropEnable: true
+# Drop Item need permission (only works entity/block drop)
+DropNeedPermission: false
+# Drop Item chance
+# Warning: Changing this may cause previously dropped items to not be craftable into catchball
+DropItemChance: 50%
+# Drop Item Material
+DropItemMaterial: EGG
+# Can drop item method (CHICKEN/ENTITY/BLOCK)
+# CHICKEN: Chicken lays eggs
+# ENTITY: Entity death
+# BLOCK: Block break (Non-creative mode)
+DropMethod: CHICKEN
+# Drop entity or block type
+DropEntityType: CHICKEN
+DropBlockType: DIAMOND_ORE
 
 # Captured sound effects, No sound to type (false)
 # Sound Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
@@ -40,14 +52,14 @@ Recipe:
     enabled: true
     # Recipe key
     key:
-        # GOLDEGG is the plugin provided custom item
+        # DROPITEM is the plugin provided custom item
         # Item Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/material/package-summary.html
-        G: GOLDEGG
+        I: DROPITEM
     # Recipe
     shape:
-        - "GGG"
-        - "GGG"
-        - "GGG"
+        - "III"
+        - "III"
+        - "III"
 
 # Disable if you don't want CatchBall check Residence flag
 UseRes: true
