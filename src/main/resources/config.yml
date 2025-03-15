@@ -1,6 +1,8 @@
 # Some of the content has been relocated to the locale folder within the configuration file.
 # Discord: https://discord.gg/uQ4UXANnP2
 # GitHub: https://github.com/MagicTeaMC/CatchBall
+# Modrinth: https://modrinth.com/plugin/catchball
+# Latest config.yml: https://github.com/MagicTeaMC/CatchBall2/blob/release/src/main/resources/config.yml
 
 # Locale, Current support:
 # en(English), zh_tw(繁體中文_臺灣)
@@ -78,3 +80,9 @@ UseMM: true
 
 CatchableEntity:
     - SHEEP
+
+# If you have to custom item, you can change this to your want.
+# Set to 0 can disable it.
+# Never change it if you don't know what is this.
+customModelData: 0
+ballCustomModelData: 0
