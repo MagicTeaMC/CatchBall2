@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.0.3"
+version = "2.0.4"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -56,8 +56,8 @@ repositories {
 
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
-    api("com.github.Paulem79:Spigot-UpdateChecker:3cfb265fb8")
-    api("de.tr7zw:item-nbt-api:2.14.2-SNAPSHOT")
+    api("com.jeff_media:SpigotUpdateChecker:3.0.4")
+    api("de.tr7zw:item-nbt-api:2.14.2-20250325.215515-5")
     api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.7.1")
@@ -101,7 +101,8 @@ tasks {
 
         minimize()
 
-        relocate("com.jeff_media.updatechecker", "org.milkteamc.autotreechop.libs.updatechecker")
+        relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
+        relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
 
     }
 }
