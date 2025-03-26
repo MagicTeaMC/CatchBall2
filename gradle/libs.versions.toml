@@ -13,7 +13,7 @@ de-tr7zw-item-nbt-api = "2.14.2-SNAPSHOT"
 io-lumine-mythic-dist = "5.8.1"
 me-clip-placeholderapi = "2.11.6"
 org-bstats-bstats-bukkit = "3.1.0"
-org-spigotmc-spigot-api = "1.20.5-R0.1-SNAPSHOT"
+org-spigotmc-spigot-api = "1.21.5-R0.1-SNAPSHOT"
 res-residence = "5.1.4.3"
 
 [libraries]
