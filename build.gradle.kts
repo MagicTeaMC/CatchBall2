@@ -59,7 +59,7 @@ dependencies {
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
     api("de.tr7zw:item-nbt-api:2.14.2-20250325.215515-5")
     api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
-    compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.8.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
