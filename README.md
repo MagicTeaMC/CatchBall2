@@ -17,6 +17,7 @@ You can download a copy at [Modrinth](https://modrinth.com/plugin/catchball)
 - GriefPrevention
 - Lands
 - RedProtect
+- SimpleClaimSystem
 - MythicMobs
 - PlaceholderAPI
 
