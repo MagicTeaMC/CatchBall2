@@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import net.md_5.bungee.api.ChatColor;
 
+import static com.github.nutt1101.ConfigSetting.customModelData;
+
 public class Ball {
 
     public static ItemStack makeBall() {
@@ -25,6 +27,10 @@ public class Ball {
         meta.setLore(TranslationFileReader.catchBallLore.stream().map(lore -> ChatColor.
                         translateAlternateColorCodes('&', lore)).
                 collect(Collectors.toList()));
+
+        if(customModelData != 0) {
+            meta.setCustomModelData(customModelData);
+        }
 
         catchball.setItemMeta(meta);
 

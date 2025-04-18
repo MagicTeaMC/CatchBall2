@@ -39,6 +39,8 @@ public class ConfigSetting {
     public static boolean ShowParticles;
     public static String CustomParticles;
     public static double catchFailRate;
+    public static int customModelData;
+    public static int ballCustomModelData;
     public static boolean UseRes;
     public static boolean UseGF;
     public static boolean UseLands;
@@ -93,6 +95,12 @@ public class ConfigSetting {
         CustomParticles = config.isSet("CustomParticles") ? config.getString("CustomParticles") : "CLOUD";
         catchFailRate = !config.isSet("catchFailRate") ? config.getDouble("catchFailRate")
         : 0.1;
+        customModelData = !config.isSet("customModelData") ? config.getInt("customModelData")
+                : 0;
+
+        ballCustomModelData = !config.isSet("ballCustomModelData") ? config.getInt("ballCustomModelData")
+                : 0;
+
 
         try {
             TranslationFileReader.init();

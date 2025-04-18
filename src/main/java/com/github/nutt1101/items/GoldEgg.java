@@ -13,6 +13,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.md_5.bungee.api.ChatColor;
 
+import static com.github.nutt1101.ConfigSetting.ballCustomModelData;
+import static com.github.nutt1101.ConfigSetting.customModelData;
+
 public class GoldEgg {
 
     public static ItemStack makeGoldEgg() {
@@ -26,6 +29,10 @@ public class GoldEgg {
         meta.setLore(TranslationFileReader.goldEggLore.stream().map(lore -> ChatColor.
                 translateAlternateColorCodes('&', lore).replace("{PERCENT}", String.valueOf(ConfigSetting.
                         chickenDropGoldEggChance))).collect(Collectors.toList()));
+
+        if(ballCustomModelData != 0) {
+            meta.setCustomModelData(ballCustomModelData);
+        }
 
         goldEgg.setItemMeta(meta);
 
