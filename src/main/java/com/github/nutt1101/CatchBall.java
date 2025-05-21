@@ -43,8 +43,8 @@ public class CatchBall extends JavaPlugin {
 
         new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
                 .checkEveryXHours(1) // Check every hour
-                .setDownloadLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
-                .setChangelogLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
+                .setDownloadLink("https://modrinth.com/plugin/catchball/version/latest")
+                .setChangelogLink("https://modrinth.com/plugin/catchball/version/latest")
                 .checkNow(); // And check right now
 
         checkPluginHook("Residence");
