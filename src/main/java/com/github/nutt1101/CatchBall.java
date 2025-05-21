@@ -36,7 +36,8 @@ public class CatchBall extends JavaPlugin {
 
         ConfigSetting.checkConfig();
 
-        new Metrics(this, 12380);
+        Metrics metrics = new Metrics(this, 12380);
+
         registerEvent();
         registerCommand();
 
@@ -58,6 +59,17 @@ public class CatchBall extends JavaPlugin {
 
         HandySchedulerUtil.init(this);
 
+    }
+
+        @Override
+    public void onDisable() {
+        // Shutdown metrics
+        if (metrics != null) {
+            metrics.shutdown();
+        }
+
+        // Cancel all tasks registered by this plugin
+        getServer().getScheduler().cancelTasks(this);
     }
 
     // register event
