@@ -40,7 +40,7 @@ public class CatchBall extends JavaPlugin {
         registerEvent();
         registerCommand();
 
-        new UpdateChecker(this, UpdateCheckSource.HANGAR, "Maoyue_OUO/CatchBall/Release")
+        new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
                 .checkEveryXHours(1) // Check every hour
                 .setDownloadLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
                 .setChangelogLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
