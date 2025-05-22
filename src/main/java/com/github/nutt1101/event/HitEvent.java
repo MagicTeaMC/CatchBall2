@@ -35,7 +35,7 @@ import java.util.Objects;
 
 
 public class HitEvent implements Listener {
-    private List<EntityType> catchableEntity = ConfigSetting.catchableEntity;
+    private List<String> catchableEntity = ConfigSetting.catchableEntity; // Changed from EntityType to String
     private Location hitLocation;
     private final Plugin plugin = CatchBall.plugin;
     private final String[] mmPackage = {"io.lumine.mythic.bukkit.BukkitAPIHelper", "io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper"};
@@ -43,6 +43,14 @@ public class HitEvent implements Listener {
     LandsIntegration api;
     WorldGuardPlugin worldGuard;
     private SimpleClaimSystemAPI scs;
+
+    /**
+     * Check if an entity is catchable by comparing string names
+     */
+    private boolean isEntityCatchable(EntityType entityType) {
+        String entityName = entityType.name();
+        return catchableEntity.contains(entityName);
+    }
 
     /* private final EntityType[] blockEntity = {EntityType.ARROW, EntityType.AREA_EFFECT_CLOUD, EntityType.MINECART_COMMAND,
         EntityType.EGG, EntityType.DRAGON_FIREBALL, EntityType.ENDER_PEARL, EntityType.THROWN_EXP_BOTTLE , EntityType.EXPERIENCE_ORB,
@@ -116,14 +124,11 @@ public class HitEvent implements Listener {
 
                 String checkCustom = getIsCustomEntity(hitEntity);
 
-                // check if the hitEntity is a catchable entity. on config.yml CatchableEntity
-                for (EntityType entity : catchableEntity) {
-                    if (hitEntity.getType().equals(entity) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
-                        hitEntity.remove();
-                        hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(event.getHitEntity(), null));
-
-                        return;
-                    }
+                // Use string comparison instead of EntityType comparison
+                if (isEntityCatchable(hitEntity.getType()) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
+                    hitEntity.remove();
+                    hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(event.getHitEntity(), null));
+                    return;
                 }
 
                 hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
@@ -240,33 +245,31 @@ public class HitEvent implements Listener {
 
         String checkCustom = getIsCustomEntity(hitEntity);
 
-        // Check if the hitEntity is a catchable entity
-        for (EntityType entity : catchableEntity) {
-            if (hitEntity.getType().equals(entity) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
-                // Check catch failure rate
-                if(Math.random() < ConfigSetting.catchFailRate) {
-                    hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchFail, getCoordinate(hitLocation), entity.toString()));
-                    return;
-                }
-
-                // Success sound
-                if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
-                    player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
-                }
-
-                // Remove the entity and drop the head
-                hitEntity.remove();
-                hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(hitEntity, player));
-
-                // Show particles
-                if (ConfigSetting.ShowParticles) {
-                    hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
-                }
-
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), entity.toString()));
+        // Use string comparison instead of EntityType comparison
+        if (isEntityCatchable(hitEntity.getType()) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
+            // Check catch failure rate
+            if(Math.random() < ConfigSetting.catchFailRate) {
+                hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchFail, getCoordinate(hitLocation), hitEntity.getType().name()));
                 return;
             }
+
+            // Success sound
+            if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
+                player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
+            }
+
+            // Remove the entity and drop the head
+            hitEntity.remove();
+            hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(hitEntity, player));
+
+            // Show particles
+            if (ConfigSetting.ShowParticles) {
+                hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
+            }
+
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), hitEntity.getType().name()));
+            return;
         }
 
         // If entity cannot be caught, return catch ball

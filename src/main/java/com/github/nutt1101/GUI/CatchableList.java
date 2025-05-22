@@ -7,7 +7,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -18,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 
 public class CatchableList {
-    private List<ItemStack> head = new ArrayList<>();  // Consider making it private to maintain encapsulation
+    private List<ItemStack> head = new ArrayList<>();
     private ItemStack prevPage = new ItemStack(Material.PAPER);
     private ItemStack nextPage = new ItemStack(Material.PAPER);
     private ItemStack currentPage = new ItemStack(Material.OAK_SIGN);
 
-    private ItemStack itemSet(ItemStack item, String displayName, int page) { // Make methods private if they're not used outside of this class
+    private ItemStack itemSet(ItemStack item, String displayName, int page) {
         displayName = displayName.replace("{PAGE}", String.valueOf(page));
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setDisplayName(ConfigSetting.toChat(displayName, "", ""));
@@ -31,16 +30,40 @@ public class CatchableList {
         return item;
     }
 
+     // Check if an entity is catchable by comparing string names instead of EntityType
+     // This method provides better compatibility with older Minecraft versions
+    private boolean isEntityCatchable(String entityName) {
+        // Convert the catchable entity list to string names for comparison
+        for (Object catchableEntity : ConfigSetting.catchableEntity) {
+            String catchableEntityName;
+
+            // Handle both EntityType objects and string names
+            if (catchableEntity instanceof String) {
+                catchableEntityName = (String) catchableEntity;
+            } else {
+                // If it's an EntityType, get its name
+                catchableEntityName = catchableEntity.toString();
+            }
+
+            if (catchableEntityName.equalsIgnoreCase(entityName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void openCatchableList(Player player, int page) {
         YamlConfiguration entityFile = ConfigSetting.entityFile;
         Set<String> entityList = entityFile.getConfigurationSection("EntityList").getKeys(false);
         Inventory catchableInventory = Bukkit.createInventory(player, 54, ConfigSetting.toChat(TranslationFileReader.catchableListTitle, "", ""));
-        head.clear();  // Clear existing items in the head list
+        head.clear();
 
         for (String entity : entityList) {
             ItemStack skull = new HeadDrop().skullTextures(new ItemStack(Material.PLAYER_HEAD), entityFile, entity);
             ItemMeta skullMeta = skull.getItemMeta();
-            String catchable = ConfigSetting.catchableEntity.contains(EntityType.valueOf(entity)) ? "&aTRUE" : "&cFALSE";
+
+            // Use string comparison instead of EntityType.valueOf()
+            String catchable = isEntityCatchable(entity) ? "&aTRUE" : "&cFALSE";
             skullMeta.setDisplayName(ChatColor.WHITE + entity);
 
             List<String> lore = new ArrayList<>();

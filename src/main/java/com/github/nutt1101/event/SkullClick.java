@@ -23,19 +23,31 @@ import org.bukkit.plugin.Plugin;
 
 public class SkullClick implements Listener{
     private final Plugin plugin = CatchBall.plugin;
-    
+
+    /**
+     * Safely convert string to EntityType, with fallback
+     */
+    private EntityType getEntityType(String entityTypeString) {
+        try {
+            return EntityType.valueOf(entityTypeString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid entity type: " + entityTypeString + ", using CHICKEN as fallback");
+            return EntityType.CHICKEN; // Fallback to a common entity
+        }
+    }
+
     @EventHandler
     public void skullClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = (event.getItem() != null) ? event.getItem() : new ItemStack(Material.AIR);
-        
+
 
         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (!item.getType().equals(Material.PLAYER_HEAD)) { return; }
 
             ItemMeta itemMeta = item.getItemMeta();
             PersistentDataContainer data = itemMeta.getPersistentDataContainer();
-            
+
             if (data.has(new NamespacedKey(plugin, "skullData"), PersistentDataType.STRING)) {
                 String path = data.get(new NamespacedKey(plugin, "skullData"), PersistentDataType.STRING).toString();
 
@@ -54,16 +66,19 @@ public class SkullClick implements Listener{
                     }
 
                     try {
-                        EntityType entityType = EntityType.valueOf(data.get(new NamespacedKey(plugin, "entityType"), PersistentDataType.STRING));
+                        // Use safe method to get EntityType
+                        String entityTypeString = data.get(new NamespacedKey(plugin, "entityType"), PersistentDataType.STRING);
+                        EntityType entityType = getEntityType(entityTypeString);
+
                         Location clickLocation = event.getClickedBlock().getLocation();
 
                         clickLocation.setX(clickLocation.getBlockX() + 0.5);
                         clickLocation.setZ(clickLocation.getBlockZ() + 0.5);
-                        
+
                         for (int i=0; i < 3; i++) {
                             if (clickLocation.getBlock().getType().equals(Material.AIR) || clickLocation.getBlock().getType().equals(Material.WATER)) { break; }
                             clickLocation.setY(clickLocation.getY() + 1D);
-                            
+
                             if (i == 2) {
                                 player.sendMessage(ConfigSetting.toChat(TranslationFileReader.locationUnsafe, "", ""));
                                 event.setCancelled(true);
@@ -79,16 +94,16 @@ public class SkullClick implements Listener{
 
                         NBTHandler.loadEntityNBT(plugin, entity, data);
                         PlayerSchedulerUtil.teleport(entity, location);
-                        
+
                         event.getItem().setAmount(0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    
+
                 }
-                
+
             }
         }
     }
-    
+
 }

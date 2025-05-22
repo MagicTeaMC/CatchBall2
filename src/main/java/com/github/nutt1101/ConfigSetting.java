@@ -26,11 +26,11 @@ public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;
     public static String locale;
     public static boolean updatecheck;
-    public static List<EntityType> catchableEntity = new ArrayList<>();
+    public static List<String> catchableEntity = new ArrayList<>(); // Changed from EntityType to String
     public static boolean DropEnable;
     public static boolean DropNeedPermission;
     public static DropMethodType DropMethod;
-    public static EntityType DropEntityType;
+    public static String DropEntityType; // Changed from EntityType to String
     public static Material DropBlockType;
     public static int DropItemChance;
     public static Material DropItemMaterial;
@@ -57,6 +57,18 @@ public class ConfigSetting {
 
     // TODO
     // public static boolean UseWG;
+
+    /**
+     * Check if an entity type string is valid (exists in current server version)
+     */
+    private static boolean isValidEntityType(String entityName) {
+        try {
+            EntityType.valueOf(entityName.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 
     /**
      * Initialize or reload the plugin
@@ -92,7 +104,14 @@ public class ConfigSetting {
             plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
             DropMethod = DropMethodType.CHICKEN;
         }
-        DropEntityType = config.isSet("DropEntityType") ? EntityType.valueOf(config.getString("DropEntityType")) : EntityType.CHICKEN;
+
+        // Store as string instead of EntityType
+        DropEntityType = config.isSet("DropEntityType") ? config.getString("DropEntityType").toUpperCase() : "CHICKEN";
+        if (!isValidEntityType(DropEntityType)) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropEntityType in config.yml, using default 'CHICKEN'.");
+            DropEntityType = "CHICKEN";
+        }
+
         DropBlockType = config.isSet("DropBlockType") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropBlockType"))) : Material.DIAMOND_ORE;
 
         updatecheck = !config.isSet("Update-Check") || config.getBoolean("Update-Check");
@@ -171,13 +190,13 @@ public class ConfigSetting {
             griefPreventionFlag.add("Access");
         }
 
+        // Changed: Load entities as strings and validate them
         for (String entity : config.getStringList("CatchableEntity")) {
-            try {
-                EntityType.valueOf(entity.toUpperCase());// entityType only can receive UpperCase words
-                catchableEntity.add(EntityType.valueOf(entity.toUpperCase()));
-
-                // There is a common issue that you put an unknown entityType in the list of CatchableEntity
-            } catch (IllegalArgumentException e) {
+            String entityName = entity.toUpperCase();
+            if (isValidEntityType(entityName)) {
+                catchableEntity.add(entityName);
+            } else {
+                plugin.getLogger().log(Level.WARNING, ChatColor.YELLOW + "Unknown entity type '" + entity + "' in CatchableEntity list, skipping...");
             }
         }
 
@@ -264,11 +283,9 @@ public class ConfigSetting {
      */
     public static void saveEntityList() {
         FileConfiguration fileConfiguration = plugin.getConfig();
-        List<String> savelist = new ArrayList<>();
 
-        ConfigSetting.catchableEntity.forEach(e -> savelist.add(e.toString()));
-
-        fileConfiguration.set("CatchableEntity", savelist.toArray());
+        // Changed: catchableEntity is already a List<String>, so no need to convert
+        fileConfiguration.set("CatchableEntity", catchableEntity.toArray());
 
         try {
             fileConfiguration.save(new File(plugin.getDataFolder(), "config.yml"));

@@ -53,7 +53,7 @@ public class Command implements CommandExecutor {
                             .getKeys(false);
                     for (String entity : entityList) {
                         if (!ConfigSetting.catchableEntity.contains(EntityType.valueOf(entity))) {
-                            ConfigSetting.catchableEntity.add(EntityType.valueOf(entity.toUpperCase()));
+                            ConfigSetting.catchableEntity.add(String.valueOf(EntityType.valueOf(entity.toUpperCase())));
                         }
                     }
                     sender.sendMessage(ChatColor.translateAlternateColorCodes('&', TranslationFileReader.allEntityAddSuccess));
@@ -71,7 +71,7 @@ public class Command implements CommandExecutor {
                     return true;
                 }
 
-                ConfigSetting.catchableEntity.add(EntityType.valueOf(args[1].toUpperCase()));
+                ConfigSetting.catchableEntity.add(String.valueOf(EntityType.valueOf(args[1].toUpperCase())));
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successAddEntity, "", args[1].toUpperCase()));
                 ConfigSetting.saveEntityList();
                 return true;
