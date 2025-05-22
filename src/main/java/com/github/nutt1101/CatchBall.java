@@ -7,6 +7,7 @@ import com.github.nutt1101.event.DropGoldEgg;
 import com.github.nutt1101.event.GUIClick;
 import com.github.nutt1101.event.HitEvent;
 import com.github.nutt1101.event.SkullClick;
+import org.bstats.bukkit.Metrics;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
