@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.0.4"
+version = "2.1.0"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -103,6 +103,7 @@ tasks {
 
         relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
+        relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 
     }
 }
