@@ -115,17 +115,12 @@ public class ConfigSetting {
                 || config.getBoolean("ShowParticles");
         CustomParticles = config.isSet("CustomParticles") ? config.getString("CustomParticles") : "CLOUD";
         catchFailRate = !config.isSet("catchFailRate") ? config.getDouble("catchFailRate")
-<<<<<<< HEAD
                 : 0.1;
-=======
-        : 0.1;
         customModelData = !config.isSet("customModelData") ? config.getInt("customModelData")
                 : 0;
 
         ballCustomModelData = !config.isSet("ballCustomModelData") ? config.getInt("ballCustomModelData")
                 : 0;
-
->>>>>>> dev
 
         try {
             TranslationFileReader.init();

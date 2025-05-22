@@ -10,14 +10,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.stream.Collectors;
 
-<<<<<<< HEAD:src/main/java/com/github/nutt1101/items/DropItem.java
-public class DropItem {
-=======
 import static com.github.nutt1101.ConfigSetting.ballCustomModelData;
 import static com.github.nutt1101.ConfigSetting.customModelData;
 
-public class GoldEgg {
->>>>>>> dev:src/main/java/com/github/nutt1101/items/GoldEgg.java
+public class DropItem {
 
     public static ItemStack makeDropItem() {
         ItemStack dropItem = new ItemStack(ConfigSetting.DropItemMaterial);
@@ -31,15 +27,11 @@ public class GoldEgg {
                 translateAlternateColorCodes('&', lore).replace("{PERCENT}", String.valueOf(ConfigSetting.
                         DropItemChance))).collect(Collectors.toList()));
 
-<<<<<<< HEAD:src/main/java/com/github/nutt1101/items/DropItem.java
-        dropItem.setItemMeta(meta);
-=======
         if(ballCustomModelData != 0) {
             meta.setCustomModelData(ballCustomModelData);
         }
 
-        goldEgg.setItemMeta(meta);
->>>>>>> dev:src/main/java/com/github/nutt1101/items/GoldEgg.java
+        dropItem.setItemMeta(meta);
 
         return dropItem;
     }
