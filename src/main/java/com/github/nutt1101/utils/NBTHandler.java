@@ -44,6 +44,7 @@ public class NBTHandler {
                         ageableEntity.setAdult();
                     } else {
                         ageableEntity.setBaby();
+                    }
                 }
             }
         } catch (Exception e) {
