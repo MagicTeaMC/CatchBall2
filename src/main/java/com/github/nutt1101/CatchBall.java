@@ -4,6 +4,7 @@ import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.*;
+import org.bstats.bukkit.Metrics;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
@@ -15,10 +16,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
 
-public class CatchBall extends JavaPlugin{
+public class CatchBall extends JavaPlugin {
     private FileConfiguration config = this.getConfig();
 
     public static Plugin plugin;
+
+    private Metrics metrics;
 
     private void checkPluginHook(String pluginName) {
         if (this.getServer().getPluginManager().getPlugin(pluginName) != null) {
@@ -33,14 +36,15 @@ public class CatchBall extends JavaPlugin{
 
         ConfigSetting.checkConfig();
 
-        new Metrics(this, 12380);
+        Metrics metrics = new Metrics(this, 12380);
+
         registerEvent();
         registerCommand();
 
-        new UpdateChecker(this, UpdateCheckSource.HANGAR, "Maoyue_OUO/CatchBall/Release")
+        new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
                 .checkEveryXHours(1) // Check every hour
-                .setDownloadLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
-                .setChangelogLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
+                .setDownloadLink("https://modrinth.com/plugin/catchball/version/latest")
+                .setChangelogLink("https://modrinth.com/plugin/catchball/version/latest")
                 .checkNow(); // And check right now
 
         checkPluginHook("Residence");
@@ -55,6 +59,17 @@ public class CatchBall extends JavaPlugin{
 
         HandySchedulerUtil.init(this);
 
+    }
+
+    @Override
+    public void onDisable() {
+        // Shutdown metrics
+        if (metrics != null) {
+            metrics.shutdown();
+        }
+
+        // Cancel all tasks registered by this plugin
+        getServer().getScheduler().cancelTasks(this);
     }
 
     // register event
