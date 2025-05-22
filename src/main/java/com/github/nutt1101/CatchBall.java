@@ -23,6 +23,8 @@ public class CatchBall extends JavaPlugin {
 
     public static Plugin plugin;
 
+    private Metrics metrics;
+
     private void checkPluginHook(String pluginName) {
         if (this.getServer().getPluginManager().getPlugin(pluginName) != null) {
             plugin.getLogger().log(Level.INFO, ChatColor.GREEN + pluginName + " Hook!");
@@ -61,7 +63,7 @@ public class CatchBall extends JavaPlugin {
 
     }
 
-        @Override
+    @Override
     public void onDisable() {
         // Shutdown metrics
         if (metrics != null) {
