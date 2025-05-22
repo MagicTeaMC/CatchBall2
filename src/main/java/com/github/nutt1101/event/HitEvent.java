@@ -331,7 +331,7 @@ public class HitEvent implements Listener {
 
     public boolean scsCheck(Player player, Location location) {
         if (plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") == null) { return true; }
-        fr.xyness.SCS.Claim claim = scs.getClaimAtChunk(getChunkFromLocation(location));
+        fr.xyness.SCS.Types.Claim claim = scs.getClaimAtChunk(getChunkFromLocation(location));
         if (claim != null) {
             return claim.getPermission(player.getName(), null);
         }
