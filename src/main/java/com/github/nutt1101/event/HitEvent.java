@@ -27,6 +27,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.projectiles.BlockProjectileSource;
 
@@ -45,10 +47,10 @@ public class HitEvent implements Listener {
     LandsIntegration api;
     WorldGuardPlugin worldGuard;
     private SimpleClaimSystemAPI scs;
-    
-    /* private final EntityType[] blockEntity = {EntityType.ARROW, EntityType.AREA_EFFECT_CLOUD, EntityType.MINECART_COMMAND, 
+
+    /* private final EntityType[] blockEntity = {EntityType.ARROW, EntityType.AREA_EFFECT_CLOUD, EntityType.MINECART_COMMAND,
         EntityType.EGG, EntityType.DRAGON_FIREBALL, EntityType.ENDER_PEARL, EntityType.THROWN_EXP_BOTTLE , EntityType.EXPERIENCE_ORB,
-        EntityType.ENDER_SIGNAL, EntityType.FALLING_BLOCK, EntityType.FIREBALL, EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME, 
+        EntityType.ENDER_SIGNAL, EntityType.FALLING_BLOCK, EntityType.FIREBALL, EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME,
         EntityType.DROPPED_ITEM, EntityType.THROWN_EXP_BOTTLE, EntityType.SHULKER_BULLET , EntityType.SMALL_FIREBALL , EntityType.SNOWBALL,
         EntityType.PRIMED_TNT, EntityType.TRIDENT, EntityType.PLAYER};   */
 
@@ -92,100 +94,7 @@ public class HitEvent implements Listener {
             event.getEntity().remove();
             // hit a entity
             if (event.getHitEntity() != null) {
-
-                if (!resCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseRes) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                if (!mmCheck(player, event.getHitEntity()) && ConfigSetting.UseMM) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                if (!gfCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseGF) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                if (!landsCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseLands) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                if (!rpCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseRP) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                if (!scsCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseSCS) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }
-
-                // TODO
-                /*if (!wgCheck(player, event.getHitEntity().getLocation()) && ConfigSetting.UseWG) {
-                    event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                    return;
-                }*/
-
-
-                if (event.getHitEntity() instanceof Tameable tameable) {
-                    Player shooter = (Player) event.getEntity().getShooter();
-                    if (tameable.isTamed()) {
-                        boolean isNullOwnerValue = tameable.getOwner() == null;
-                        boolean sameOwner = isNullOwnerValue ? true : tameable.getOwner().getName().equals(shooter.getName());
-                        if ((isNullOwnerValue && !ConfigSetting.allowCatchableTamedOwnerIsNull) || !sameOwner) {
-                            event.getHitEntity().getWorld().dropItem(event.getHitEntity().getLocation(), Ball.makeBall());
-                            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(event.getHitEntity().getLocation()), ""));
-                            return;
-                        }
-                    }
-
-                }
-
-                Entity hitEntity = event.getHitEntity();
-                hitLocation = hitEntity.getLocation();
-
-                String checkCustom = getIsCustomEntity(hitEntity);
-
-
-                // check if the hitEntity is a catchable entity. on config.yml CatchableEntity
-                for (EntityType entity : catchableEntity) {
-                    if (hitEntity.getType().equals(entity) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
-                        if(Math.random() < ConfigSetting.catchFailRate) {
-                            hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
-                            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchFail, getCoordinate(hitLocation), entity.toString()));
-                            return;
-                        }
-                        // hitEntity.getWorld().dropItem(hitEntity.getLocation(), entityToItemStack(entity));
-                        if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
-                            player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
-                        }
-
-                        event.getHitEntity().remove();
-
-                        hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(event.getHitEntity(), player));
-                        if (ConfigSetting.ShowParticles) {
-                            hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
-                        }
-
-                        player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), entity.toString()));
-                        return;
-                    }
-                }
-
-                // if player hit a can not be catch entity, catchBall will be return
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitLocation), ""));
-                hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
-
+                handleEntityCatch(player, event.getHitEntity(), true);
                 // hit block, catchBall will be return
             } else if (event.getHitBlock() != null) {
 
@@ -233,6 +142,150 @@ public class HitEvent implements Listener {
         return;
     }
 
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity targetEntity = event.getRightClicked();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        // Initialize APIs if plugins are present
+        if(plugin.getServer().getPluginManager().getPlugin("Lands") != null) {
+            api = LandsIntegration.of(plugin);
+        }
+
+        if(plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") != null) {
+            scs = SimpleClaimSystemAPI_Provider.getAPI();
+        }
+
+        // Check if player is holding a catch ball
+        if (!isCatchBall(itemInHand)) {
+            return;
+        }
+
+        // Check permissions
+        if (!player.hasPermission("catchball.use")) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
+                    getCoordinate(targetEntity.getLocation()), "").replace("{BALL}", TranslationFileReader.catchBallName)));
+            return;
+        }
+
+        event.setCancelled(true);
+
+        // Remove one catch ball from inventory
+        if (itemInHand.getAmount() > 1) {
+            itemInHand.setAmount(itemInHand.getAmount() - 1);
+        } else {
+            player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
+        }
+
+        // Handle the entity catch
+        handleEntityCatch(player, targetEntity, false);
+    }
+
+    private void handleEntityCatch(Player player, Entity hitEntity, boolean isProjectile) {
+        hitLocation = hitEntity.getLocation();
+
+        // Check all protection plugins
+        if (!resCheck(player, hitEntity.getLocation()) && ConfigSetting.UseRes) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        if (!mmCheck(player, hitEntity) && ConfigSetting.UseMM) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        if (!gfCheck(player, hitEntity.getLocation()) && ConfigSetting.UseGF) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        if (!landsCheck(player, hitEntity.getLocation()) && ConfigSetting.UseLands) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        if (!rpCheck(player, hitEntity.getLocation()) && ConfigSetting.UseRP) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        if (!scsCheck(player, hitEntity.getLocation()) && ConfigSetting.UseSCS) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
+        // TODO: Uncomment when WorldGuard check is implemented
+        /*if (!wgCheck(player, hitEntity.getLocation()) && ConfigSetting.UseWG) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }*/
+
+        // Check if entity is tameable and owned by someone else
+        if (hitEntity instanceof Tameable tameable) {
+            if (tameable.isTamed()) {
+                boolean isNullOwnerValue = tameable.getOwner() == null;
+                boolean sameOwner = isNullOwnerValue ? true : tameable.getOwner().getName().equals(player.getName());
+                if ((isNullOwnerValue && !ConfigSetting.allowCatchableTamedOwnerIsNull) || !sameOwner) {
+                    hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+                    return;
+                }
+            }
+        }
+
+        String checkCustom = getIsCustomEntity(hitEntity);
+
+        // Check if the hitEntity is a catchable entity
+        for (EntityType entity : catchableEntity) {
+            if (hitEntity.getType().equals(entity) && !(hitEntity instanceof Player) && !checkCustom.equals("CUSTOM")) {
+                // Check catch failure rate
+                if(Math.random() < ConfigSetting.catchFailRate) {
+                    hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
+                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchFail, getCoordinate(hitLocation), entity.toString()));
+                    return;
+                }
+
+                // Success sound
+                if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
+                    player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
+                }
+
+                // Remove the entity and drop the head
+                hitEntity.remove();
+                hitEntity.getWorld().dropItem(hitLocation, new HeadDrop().getEntityHead(hitEntity, player));
+
+                // Show particles
+                if (ConfigSetting.ShowParticles) {
+                    hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
+                }
+
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), entity.toString()));
+                return;
+            }
+        }
+
+        // If entity cannot be caught, return catch ball
+        player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitLocation), ""));
+        hitEntity.getWorld().dropItem(hitLocation, Ball.makeBall());
+    }
+
+    private boolean isCatchBall(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+
+        ItemStack catchBall = Ball.makeBall();
+        return item.isSimilar(catchBall);
+    }
 
     // config text will be use this method , so put on this class
     public static String getCoordinate(Location location) {
@@ -300,27 +353,27 @@ public class HitEvent implements Listener {
     public boolean gfCheck(Player player, Location location) {
         if (plugin.getServer().getPluginManager().getPlugin("GriefPrevention") == null) {return true;}
 
-            Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
-            if (claim == null) {
-                return true;
-            }
-
-            java.util.UUID ownerId = claim.getOwnerID();
-            if ((ownerId != null && ownerId.equals(player.getUniqueId())) ||
-                    player.hasPermission("catchball.op") || player.isOp()) {
-                return true;
-            }
-
-            for (String flags : ConfigSetting.griefPreventionFlag) {
-                if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
-                    player.sendMessage(ConfigSetting.toChat(
-                                    TranslationFileReader.noResidencePermissions, "", "")
-                            .replace("{FLAG}", flags));
-
-                    return false;
-                }
-            }
+        Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
+        if (claim == null) {
             return true;
+        }
+
+        java.util.UUID ownerId = claim.getOwnerID();
+        if ((ownerId != null && ownerId.equals(player.getUniqueId())) ||
+                player.hasPermission("catchball.op") || player.isOp()) {
+            return true;
+        }
+
+        for (String flags : ConfigSetting.griefPreventionFlag) {
+            if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
+                player.sendMessage(ConfigSetting.toChat(
+                                TranslationFileReader.noResidencePermissions, "", "")
+                        .replace("{FLAG}", flags));
+
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean rpCheck(Player player, Location location) {
