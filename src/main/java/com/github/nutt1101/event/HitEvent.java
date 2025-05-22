@@ -11,6 +11,8 @@ import com.github.nutt1101.HeadDrop;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
+import com.palmergames.bukkit.towny.object.TownyPermission;
+import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import fr.xyness.SCS.API.SimpleClaimSystemAPI;
 import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
@@ -223,6 +225,12 @@ public class HitEvent implements Listener {
             return;
         }
 
+        if (!townyCheck(player, hitEntity.getLocation()) && ConfigSetting.UseTowny) {
+            hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
+            return;
+        }
+
         // TODO: Uncomment when WorldGuard check is implemented
         /*if (!wgCheck(player, hitEntity.getLocation()) && ConfigSetting.UseWG) {
             hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
@@ -407,6 +415,12 @@ public class HitEvent implements Listener {
 
         return regions.queryState(localPlayer, com.sk89q.worldguard.protection.flags.Flags.DAMAGE_ANIMALS) == StateFlag.State.ALLOW;
     } */
+
+    public boolean townyCheck(Player player, Location location) {
+        if (plugin.getServer().getPluginManager().getPlugin("Towny") == null) { return true; }
+        boolean bBuild = PlayerCacheUtil.getCachePermission(player, location, Material.valueOf("dirt"), TownyPermission.ActionType.BUILD);
+        return bBuild;
+    }
 
 
     public boolean checkCatchBall(Projectile projectile) {

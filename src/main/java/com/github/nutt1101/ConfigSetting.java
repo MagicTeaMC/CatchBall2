@@ -54,6 +54,7 @@ public class ConfigSetting {
     public static boolean UseMM;
     public static boolean UseRP;
     public static boolean UseSCS;
+    public static boolean UseTowny;
 
     // TODO
     // public static boolean UseWG;
@@ -220,6 +221,9 @@ public class ConfigSetting {
 
         UseSCS = !config.isSet("UseSCS")
                 || config.getBoolean("UseSCS");
+
+        UseTowny = !config.isSet("UseTowny")
+                || config.getBoolean("UseTowny");
 
         /*UseWG = !config.isSet("UseWG")
                 || config.getBoolean("UseWG");
