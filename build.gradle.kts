@@ -64,7 +64,7 @@ dependencies {
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
-    compileOnly(files("./libs/SimpleClaimSystem-1.11.6.2.jar"))
+    compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
