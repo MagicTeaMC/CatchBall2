@@ -3,10 +3,7 @@ package com.github.nutt1101;
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
-import com.github.nutt1101.event.DropGoldEgg;
-import com.github.nutt1101.event.GUIClick;
-import com.github.nutt1101.event.HitEvent;
-import com.github.nutt1101.event.SkullClick;
+import com.github.nutt1101.event.*;
 import org.bstats.bukkit.Metrics;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
@@ -79,7 +76,11 @@ public class CatchBall extends JavaPlugin {
     public void registerEvent() {
         PluginManager registerEvent = this.getServer().getPluginManager();
         registerEvent.registerEvents(new HitEvent(), this);
-        registerEvent.registerEvents(new DropGoldEgg(), this);
+        if (ConfigSetting.DropEnable) {
+            registerEvent.registerEvents(new EntityDrop(), this);
+            registerEvent.registerEvents(new BlockDrop(), this);
+            registerEvent.registerEvents(new ChickenDrop(), this);
+        }
         registerEvent.registerEvents(new SkullClick(), this);
         registerEvent.registerEvents(new GUIClick(), this);
     }

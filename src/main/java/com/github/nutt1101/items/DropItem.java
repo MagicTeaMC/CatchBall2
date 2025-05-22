@@ -1,41 +1,38 @@
 package com.github.nutt1101.items;
 
-import java.util.stream.Collectors;
-
 import com.github.nutt1101.ConfigSetting;
-
 import com.github.nutt1101.utils.TranslationFileReader;
-import org.bukkit.Material;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.stream.Collectors;
 
 import static com.github.nutt1101.ConfigSetting.ballCustomModelData;
 import static com.github.nutt1101.ConfigSetting.customModelData;
 
-public class GoldEgg {
+public class DropItem {
 
-    public static ItemStack makeGoldEgg() {
-        ItemStack goldEgg = new ItemStack(Material.EGG);
+    public static ItemStack makeDropItem() {
+        ItemStack dropItem = new ItemStack(ConfigSetting.DropItemMaterial);
 
-        ItemMeta meta = goldEgg.getItemMeta();
-        meta.setDisplayName(ConfigSetting.toChat(TranslationFileReader.goldEggName, "", ""));
+        ItemMeta meta = dropItem.getItemMeta();
+        meta.setDisplayName(ConfigSetting.toChat(TranslationFileReader.dropItemName, "", ""));
         meta.addEnchant(Enchantment.SOUL_SPEED, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-        meta.setLore(TranslationFileReader.goldEggLore.stream().map(lore -> ChatColor.
+        meta.setLore(TranslationFileReader.dropItemLore.stream().map(lore -> ChatColor.
                 translateAlternateColorCodes('&', lore).replace("{PERCENT}", String.valueOf(ConfigSetting.
-                        chickenDropGoldEggChance))).collect(Collectors.toList()));
+                        DropItemChance))).collect(Collectors.toList()));
 
         if(ballCustomModelData != 0) {
             meta.setCustomModelData(ballCustomModelData);
         }
 
-        goldEgg.setItemMeta(meta);
+        dropItem.setItemMeta(meta);
 
-        return goldEgg;
+        return dropItem;
     }
 }
