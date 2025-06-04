@@ -66,7 +66,7 @@ dependencies {
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
-    compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
+    compileOnly("com.github.angeschossen:LandsAPI:7.15.20")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.12")
