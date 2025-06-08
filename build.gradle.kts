@@ -2,7 +2,7 @@ plugins {
     java
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.1.21"
     id("com.gradleup.shadow") version "8.3.6"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
@@ -61,15 +61,15 @@ dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
     api("de.tr7zw:item-nbt-api:2.15.0")
-    api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
+    api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
-    compileOnly("io.lumine:Mythic-Dist:5.8.2")
+    compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
-    compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
+    compileOnly("com.github.angeschossen:LandsAPI:7.15.20")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.0")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.12")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
     compileOnly(files("./libs/Residence5.1.7.5.jar"))
