@@ -1,0 +1,52 @@
+name: CatchBall
+version: ${version}
+main: com.github.nutt1101.CatchBall
+description: "A plugin that make entity to be catchable.\nDiscord support: https://discord.gg/uQ4UXANnP2"
+author: NUTT1101, MagicTeaMC
+api-version: '1.21'
+folia-supported: true
+
+dependencies:
+  server:
+    Residence:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    MythicMobs:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    GriefPrevention:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    Lands:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    RedProtect:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    SimpleClaimSystem:
+      load: BEFORE
+      required: false
+      join-classpath: false
+    Towny:
+      load: BEFORE
+      required: false
+      join-classpath: false
+
+permissions:
+  catchball.op:
+    default: op
+  catchball.use:
+    default: true
+  catchball.get.entity:
+    default: false
+  catchball.get.block:
+    default: false

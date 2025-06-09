@@ -1,7 +1,7 @@
 package com.github.nutt1101.utils;
 
-import de.tr7zw.changeme.nbtapi.NBTContainer;
-import de.tr7zw.changeme.nbtapi.NBTEntity;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
@@ -13,13 +13,17 @@ import org.bukkit.plugin.Plugin;
 public class NBTHandler {
 
     public static ItemMeta saveEntityNBT(Plugin plugin, Entity hitEntity, ItemMeta headMeta) {
-        NBTEntity nbtEntity = new NBTEntity(hitEntity);
-        String nbtData = nbtEntity.toString();
+        // Get NBT data from entity using NBT.modify to read the data
+        final String[] nbtData = new String[1];
+        NBT.modify(hitEntity, nbt -> {
+            nbtData[0] = nbt.toString();
+        });
 
+        // Store NBT data in item's persistent data container
         headMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "entity"),
                 PersistentDataType.STRING,
-                nbtData
+                nbtData[0]
         );
 
         headMeta.getPersistentDataContainer().set(
@@ -35,25 +39,33 @@ public class NBTHandler {
         try {
             String nbtString = data.get(new NamespacedKey(plugin, "entity"), PersistentDataType.STRING);
             if (nbtString != null) {
-                NBTContainer nbtContainer = new NBTContainer(nbtString);
-                NBTEntity nbtEntity = new NBTEntity(entity);
-                nbtEntity.mergeCompound(nbtContainer);
+                // Parse NBT string and apply to entity
+                ReadWriteNBT parsedNBT = NBT.parseNBT(nbtString);
+                NBT.modify(entity, nbt -> {
+                    nbt.mergeCompound(parsedNBT);
+                });
 
+                // Handle age-specific logic for Ageable entities
                 if (entity instanceof Ageable ageableEntity) {
-                    if (!nbtContainer.hasTag("IsBaby") || !nbtContainer.getBoolean("IsBaby")) {
-                        ageableEntity.setAdult();
-                    } else {
+                    boolean isBaby = parsedNBT.hasTag("IsBaby") && parsedNBT.getBoolean("IsBaby");
+                    if (isBaby) {
                         ageableEntity.setBaby();
+                    } else {
+                        ageableEntity.setAdult();
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().warning("Error loading entity NBT: " + e.getMessage());
         }
     }
 
     public static String isCustomEntity(Entity hitEntity) {
-        NBTEntity nbtEntity = new NBTEntity(hitEntity);
-        return nbtEntity.getString("Paper.SpawnReason");
+        // Read NBT data from entity to check spawn reason
+        final String[] spawnReason = new String[1];
+        NBT.modify(hitEntity, nbt -> {
+            spawnReason[0] = nbt.getString("Paper.SpawnReason");
+        });
+        return spawnReason[0];
     }
 }

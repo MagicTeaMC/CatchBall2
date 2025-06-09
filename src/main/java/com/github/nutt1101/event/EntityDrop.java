@@ -31,11 +31,6 @@ public class EntityDrop implements Listener{
         }
 
         ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
-        if (event.getEntityType().equals(ConfigSetting.DropEntityType)) {
-            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
-                event.getDrops().clear();
-                event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), DropItem.makeDropItem());
-            }
-        }
+        event.getEntityType();
     }
 }

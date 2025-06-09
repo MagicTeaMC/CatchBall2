@@ -22,14 +22,18 @@ public class Command implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
-        if (command.getName().equals("ctb")) {
+        // Handle Brigadier commands where command parameter is null
+        if (command == null || command.getName().equals("ctb") || label.equals("ctb")) {
 
             if (!(CommandCheck.check(sender, command, label, args))) {
                 return true;
             }
 
-            /* player use "/ctb get" command
-            player will get a catchBall*/
+            if (args.length == 0) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownCommandArgument, "", ""));
+                return true;
+            }
+
             if (args[0].equalsIgnoreCase("reload")) {
                 ConfigSetting.checkConfig();
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadSuccess, "", ""));
@@ -113,8 +117,7 @@ public class Command implements CommandExecutor {
                 Player player = Bukkit.getPlayer(args[1]);
 
                 if (player == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownOrOfflinePlayer, "", "")
-                            .replace("{PLAYER}", args[1]));
+                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownOrOfflinePlayer.replace("{PLAYER}", args[1]), "", ""));
                     return true;
                 }
 
@@ -139,11 +142,9 @@ public class Command implements CommandExecutor {
 
                 givePlayerItem(player, checkItem(args[2]), itemAmount);
 
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
-                        .replace("{ITEM}", args[2].toLowerCase().equals("catchball") ? TranslationFileReader.catchBallName
-                                : TranslationFileReader.dropItemName)
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer
                         .replace("{PLAYER}", player.getName())
-                        .replace("&", "§"));
+                        .replace("{ITEM}", args[2].toLowerCase().equals("catchball") ? TranslationFileReader.catchBallName : TranslationFileReader.dropItemName), "", ""));
 
                 return true;
 

@@ -12,8 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Random;
 
 public class ChickenDrop implements Listener {
-    private EntityType chicken = EntityType.CHICKEN;
-    private Random chance = new Random();
+    private final EntityType chicken = EntityType.CHICKEN;
+    private final Random chance = new Random();
 
     @EventHandler
     public void ChickenDropEgg(EntityDropItemEvent event) {

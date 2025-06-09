@@ -4,70 +4,70 @@
 # If you installed PlaceholderAPI, you can use Placeholder in messages.
 # But Placeholder about player may cause some issues.
 
-ConsoleExcuteCommand: "&cThis command can only be executed by player!"
-NoPermission: "&cYou have no permission!"
-PlayerInventoryFull: "&aYour inventory is full, so item falls at your feet!"
+ConsoleExcuteCommand: "<red>This command can only be executed by player!"
+NoPermission: "<red>You have no permission!"
+PlayerInventoryFull: "<green>Your inventory is full, so item falls at your feet!"
 
-ArgDoesNotExist: "&aCommands Usage: 
-        \n&b/ctb reload &7Reload plugin.
-        \n&b/ctb list &7Lists all catchable entities and states.
-        \n&b/ctb add [ALL | (entity_name)] &7Add the entity to the catch list.
-        \n&b/ctb remove [ALL | (entity_name)] &7Remove the entity from the catchable list.
-        \n&b/ctb give [player] [DropItem | CatchBall] [Amount] &7Give special items of plugins to player"
+ArgDoesNotExist: "<green>Commands Usage: 
+        \n<aqua>/ctb reload <gray>Reload plugin.
+        \n<aqua>/ctb list <gray>Lists all catchable entities and states.
+        \n<aqua>/ctb add [ALL | (entity_name)] <gray>Add the entity to the catch list.
+        \n<aqua>/ctb remove [ALL | (entity_name)] <gray>Remove the entity from the catchable list.
+        \n<aqua>/ctb give [player] [DropItem | CatchBall] [Amount] <gray>Give special items of plugins to player"
 
-ArgTooMuch: "&cToo many Argument!"
-UnknownCommandArgument: "&cUnknown Argument!"
-SuccessGetBall: "&aSuccessfully get {ITEM}!"
-ReloadSuccess: "&aThe plugin reloaded successfully!"
-CanNotCatchable: "&cThis entity cannot be captured, so &e{BALL} &7fell in &e{LOCATION}."
-BallHitBlock: "&cYou did not hit a entity,So {BALL} fell in {LOCATION}!"
-NoPermissionToUse: "&cYou don't have permission to use {BALL}, so {BALL} &cfell in &e{LOCATION}."
-CatchSuccess: "&aSuccessfully captured {ENTITY} location: {LOCATION}!"
-ItemDoesNotExist: "&cPlease enter the item to be picked up  &7CatchBall | DropItem."
-ItemNameError: "&cPlease enter the correct item name  &7CatchBall | DropItem!"
-AddEntityDoesNotExist: "&cPlease enter the name of the entity to be added to the list of captured creatures!"
-UnknownEntityType: "&cUnknown entity type!"
-EntityDoesExists: "&cThe entity already exists in the catchable list!"
-SuccessAddEntity: "&b{ENTITY} &aSuccessfully added to the catchable list!"
-RemoveEntityDoesNotExist: "&cPlease enter the name of the entity to be removed from the catchable list!"
-RemoveEntityNotFound: "&cNo entity found in the catchable list!"
-SuccessRemove: "&aSuccessfully removed from the catchable list &b{ENTITY}!"
-SkullDoesNotFound: "&cThe data stored in the skull is missing!"
-LocationUnsafe: "&cCould not find a safe area to spawn, so this request has been cancelled!"
-NoResidencePermissions: "&cYou can’t spawn entity here because you are lacking {FLAG} permission for this residense!"
-AllEntityAddSuccess: "&aAll Entity added success!"
-AllEntityRemoveSuccess: "&eAll Entity removed success!"
-PlayerNotExist: "&cPlease enter a player that want to give the item!"
-UnknownOrOfflinePlayer: "&cPlayer {PLAYER} not find!"
-SuccessGiveItemToPlayer: "&aSuccess give {ITEM} to &a{PLAYER}!"
-invalidItemAmount: "&cInvalid item amount!"
+ArgTooMuch: "<red>Too many Argument!"
+UnknownCommandArgument: "<red>Unknown Argument!"
+SuccessGetBall: "<green>Successfully get {ITEM}!"
+ReloadSuccess: "<green>The plugin reloaded successfully!"
+CanNotCatchable: "<red>This entity cannot be captured, so <yellow>{BALL} <gray>fell in <yellow>{LOCATION}."
+BallHitBlock: "<red>You did not hit a entity,So {BALL} fell in {LOCATION}!"
+NoPermissionToUse: "<red>You don't have permission to use {BALL}, so {BALL} <red>fell in <yellow>{LOCATION}."
+CatchSuccess: "<green>Successfully captured {ENTITY} location: {LOCATION}!"
+ItemDoesNotExist: "<red>Please enter the item to be picked up  <gray>CatchBall | DropItem."
+ItemNameError: "<red>Please enter the correct item name  <gray>CatchBall | DropItem!"
+AddEntityDoesNotExist: "<red>Please enter the name of the entity to be added to the list of captured creatures!"
+UnknownEntityType: "<red>Unknown entity type!"
+EntityDoesExists: "<red>The entity already exists in the catchable list!"
+SuccessAddEntity: "<aqua>{ENTITY} <green>Successfully added to the catchable list!"
+RemoveEntityDoesNotExist: "<red>Please enter the name of the entity to be removed from the catchable list!"
+RemoveEntityNotFound: "<red>No entity found in the catchable list!"
+SuccessRemove: "<green>Successfully removed from the catchable list <aqua>{ENTITY}!"
+SkullDoesNotFound: "<red>The data stored in the skull is missing!"
+LocationUnsafe: "<red>Could not find a safe area to spawn, so this request has been cancelled!"
+NoResidencePermissions: "<red>You can't spawn entity here because you are lacking {FLAG} permission for this residense!"
+AllEntityAddSuccess: "<green>All Entity added success!"
+AllEntityRemoveSuccess: "<yellow>All Entity removed success!"
+PlayerNotExist: "<red>Please enter a player that want to give the item!"
+UnknownOrOfflinePlayer: "<red>Player {PLAYER} not find!"
+SuccessGiveItemToPlayer: "<green>Success give {ITEM} to <green>{PLAYER}!"
+invalidItemAmount: "<red>Invalid item amount!"
 catchFail: "Oops! Your attempt to catch the creature failed. Try again!"
 
 #/ctb list GUI
-catchableListTitle: "&lCatch List Settings"
-prevPage: "&aPrevious Page"
-nextPage: "&aNext Page"
-currentPage: "&eCurrent Page: &a{PAGE}"
+catchableListTitle: "<bold>Catch List Settings"
+prevPage: "<green>Previous Page"
+nextPage: "<green>Next Page"
+currentPage: "<yellow>Current Page: <green>{PAGE}"
 guiSkullLore:
-  - "&6Custom Name: {ENTITY}"
-  - "&6Allow Catch: {CATCHABLE}"
+  - "<gold>Custom Name: {ENTITY}"
+  - "<gold>Allow Catch: {CATCHABLE}"
 
 #The plugin special item setting
 Items:
   CatchBall:
-    DisplayName: "&aCat&bch &cBall"
+    DisplayName: "<green>Cat<aqua>ch <red>Ball"
     Lore:
-      - "&7Used to capture catchable entity"
+      - "<gray>Used to capture catchable entity"
 
   DropItem:
-    DisplayName: "&6GoldEgg"
+    DisplayName: "<gold>GoldEgg"
     Lore:
-      - "&7When destroying blocks, killing creatures, or laying eggs, there is a &e{PERCENT}%&7 chance of dropping"
-      - "&7Can be used with CraftRecipe to make CatchBall"
+      - "<gray>When destroying blocks, killing creatures, or laying eggs, there is a <yellow>{PERCENT}%<gray> chance of dropping"
+      - "<gray>Can be used with CraftRecipe to make CatchBall"
 
 #The lore of the Catch List GUI
 DropSkullLore:
-  - "&eENTITY TYPE: &a{ENTITY}"
-  - "&eThe Catcher: &a{PLAYER}"
-  - "&eCapture Time: &a{TIME}"
-  - "&eCapture Location: &a{LOCATION}"
+  - "<yellow>ENTITY TYPE: <green>{ENTITY}"
+  - "<yellow>The Catcher: <green>{PLAYER}"
+  - "<yellow>Capture Time: <green>{TIME}"
+  - "<yellow>Capture Location: <green>{LOCATION}"

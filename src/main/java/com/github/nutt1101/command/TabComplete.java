@@ -15,28 +15,31 @@ import java.util.Set;
 
 public class TabComplete implements TabCompleter {
     List<String> entityList = new ArrayList<>();
-    
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        
-        // tabComplete will be show suggest arument to commandSender
-        if (command.getName().equals("ctb")) {
+
+        // For Paper plugins using Brigadier, command might be null, so check the alias instead
+        String commandName = (command != null) ? command.getName() : alias;
+
+        // tabComplete will be show suggest argument to commandSender
+        if (commandName.equals("ctb")) {
             final List<String> sort = new ArrayList<>();
-            
+
             if (!sender.hasPermission("catchball.op")) { return List.of(""); }
-            
-            if (args.length == 1) { 
+
+            if (args.length == 1) {
                 StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument(), sort);
-                return sort; 
+                return sort;
             }
 
-            if (args.length == 2) { 
+            if (args.length == 2) {
                 entityList.clear();
                 if (args[0].equalsIgnoreCase("give")) {
                     Bukkit.getOnlinePlayers().forEach(player -> {
                         sort.add(player.getName());
                     });
-                    StringUtil.copyPartialMatches(args[0], sort, sort);
+                    StringUtil.copyPartialMatches(args[1], sort, sort);
                     return sort;
                 } else if (args[0].equalsIgnoreCase("add")) {
                     Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
@@ -44,7 +47,7 @@ public class TabComplete implements TabCompleter {
                     allEntityList.stream().
                             filter(entityName -> !ConfigSetting.catchableEntity.contains(EntityType.valueOf(entityName))).
                             forEach(entity -> entityList.add(entity));
-                    
+
                     if (ConfigSetting.catchableEntity.size() < entityList.size()) { entityList.add("ALL"); }
 
                     StringUtil.copyPartialMatches(args[1], entityList, sort);
@@ -53,11 +56,11 @@ public class TabComplete implements TabCompleter {
                 } else if (args[0].equalsIgnoreCase("remove")) {
 
                     ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false).stream().
-                        filter(entityName -> ConfigSetting.catchableEntity.contains(EntityType.valueOf(entityName))).
-                        forEach(entity -> entityList.add(entity));
-                    
+                            filter(entityName -> ConfigSetting.catchableEntity.contains(EntityType.valueOf(entityName))).
+                            forEach(entity -> entityList.add(entity));
+
                     if (ConfigSetting.catchableEntity.size() > 0) { entityList.add("ALL"); }
-                    
+
                     StringUtil.copyPartialMatches(args[1], entityList, sort);
                     return sort;
                 }
@@ -75,7 +78,7 @@ public class TabComplete implements TabCompleter {
                 }
             }
         }
-        
+
         return List.of("");
     }
 }

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandCheck {
-    private static List<String> argmumentList = Arrays.asList("reload", "list", "add", "remove", "give");
+    private static List<String> argumentList = Arrays.asList("reload", "list", "add", "remove", "give");
 
     public static Boolean check(CommandSender sender, Command command, String label, String[] args) {
 
@@ -31,5 +31,7 @@ public class CommandCheck {
         return true;
     }
 
-    public static List<String> getCommandArgument() { return argmumentList; };
+    public static List<String> getCommandArgument() {
+        return argumentList;
+    }
 }

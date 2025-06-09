@@ -35,19 +35,12 @@ public class BallRecipe {
 
             for (String key : recipePath) {
                 String ItemName = config.getString("Recipe.key." + key).toUpperCase();
-                if (ItemName instanceof String) {
-                    if (ItemName.equals("DROPITEM")) {
-                        ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
-                    } else {
-                        ballRecipe.setIngredient(key.charAt(0), Material.valueOf(ItemName));
-                    }
-
+                if (ItemName.equals("DROPITEM")) {
+                    ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
                 } else {
-                    ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.MaterialChoice(
-                        config.getStringList("Recipe.key." + key).stream().map(
-                        list -> Material.valueOf(list)).collect(Collectors.toList())));
+                    ballRecipe.setIngredient(key.charAt(0), Material.valueOf(ItemName));
                 }
-                
+
             }
             
             if (Bukkit.getRecipe(ballKey) != null) { Bukkit.removeRecipe(ballKey); }

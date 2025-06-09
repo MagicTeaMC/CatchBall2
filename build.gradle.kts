@@ -55,6 +55,10 @@ repositories {
     maven {
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
@@ -62,7 +66,7 @@ dependencies {
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
     api("de.tr7zw:item-nbt-api:2.15.0")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
-    compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
@@ -87,7 +91,7 @@ tasks.processResources {
     val props = mapOf("version" to version)
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
+    filesMatching("*plugin.yml") {
         expand(props)
     }
 }
@@ -117,7 +121,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.4")
+    minecraftVersion("1.21.5")
 }
 
 runPaper.folia.registerTask()

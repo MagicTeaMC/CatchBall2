@@ -1,15 +1,12 @@
 package com.github.nutt1101;
 
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
-import com.github.nutt1101.command.Command;
-import com.github.nutt1101.command.TabComplete;
+import com.github.nutt1101.command.BrigadierCommandHandler;
 import com.github.nutt1101.event.*;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bstats.bukkit.Metrics;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
-import org.bukkit.ChatColor;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +14,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.logging.Level;
 
 public class CatchBall extends JavaPlugin {
-    private FileConfiguration config = this.getConfig();
+    {
+        this.getConfig();
+    }
 
     public static Plugin plugin;
 
@@ -25,7 +24,7 @@ public class CatchBall extends JavaPlugin {
 
     private void checkPluginHook(String pluginName) {
         if (this.getServer().getPluginManager().getPlugin(pluginName) != null) {
-            plugin.getLogger().log(Level.INFO, ChatColor.GREEN + pluginName + " Hook!");
+            plugin.getLogger().log(Level.INFO, NamedTextColor.GREEN + pluginName + " Hook!");
         }
     }
 
@@ -36,10 +35,12 @@ public class CatchBall extends JavaPlugin {
 
         ConfigSetting.checkConfig();
 
-        Metrics metrics = new Metrics(this, 12380);
+        // Initialize metrics
+        this.metrics = new Metrics(this, 12380);
 
         registerEvent();
-        registerCommand();
+        // Remove legacy command registration for Paper plugins
+        // Commands are now registered via Brigadier in registerBrigadierCommands()
 
         new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
                 .checkEveryXHours(1) // Check every hour
@@ -60,6 +61,8 @@ public class CatchBall extends JavaPlugin {
 
         HandySchedulerUtil.init(this);
 
+        // Register Brigadier commands
+        new BrigadierCommandHandler(this).registerCommands();
     }
 
     @Override
@@ -86,17 +89,17 @@ public class CatchBall extends JavaPlugin {
         registerEvent.registerEvents(new GUIClick(), this);
     }
 
-    // register command
+    /*
+    // register command (not used in Paper plugins - kept for reference)
+    // Paper plugins use Brigadier commands instead
     public void registerCommand() {
+        // This method is not called in Paper plugins
+        // Commands are registered via registerBrigadierCommands() instead
         PluginCommand ctbCommand = this.getCommand("ctb");
         if (ctbCommand != null) {
             ctbCommand.setExecutor(new Command());
             ctbCommand.setTabCompleter(new TabComplete());
         }
     }
-
-    public static String getServerVersion() {
-        return plugin.getServer().getBukkitVersion();
-    }
-
+    */
 }

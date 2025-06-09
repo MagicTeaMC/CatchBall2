@@ -3,7 +3,9 @@ package com.github.nutt1101.GUI;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.HeadDrop;
 import com.github.nutt1101.utils.TranslationFileReader;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,13 +27,16 @@ public class CatchableList {
     private ItemStack itemSet(ItemStack item, String displayName, int page) {
         displayName = displayName.replace("{PAGE}", String.valueOf(page));
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(ConfigSetting.toChat(displayName, "", ""));
+
+        // Convert legacy color codes to Component
+        Component displayNameComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(displayName);
+        itemMeta.displayName(displayNameComponent);
+
         item.setItemMeta(itemMeta);
         return item;
     }
 
-     // Check if an entity is catchable by comparing string names instead of EntityType
-     // This method provides better compatibility with older Minecraft versions
+    // Check if an entity is catchable by comparing string names instead of EntityType
     private boolean isEntityCatchable(String entityName) {
         // Convert the catchable entity list to string names for comparison
         for (Object catchableEntity : ConfigSetting.catchableEntity) {
@@ -55,22 +60,42 @@ public class CatchableList {
     public void openCatchableList(Player player, int page) {
         YamlConfiguration entityFile = ConfigSetting.entityFile;
         Set<String> entityList = entityFile.getConfigurationSection("EntityList").getKeys(false);
-        Inventory catchableInventory = Bukkit.createInventory(player, 54, ConfigSetting.toChat(TranslationFileReader.catchableListTitle, "", ""));
+
+        // Convert title to Component
+        Component inventoryTitle = LegacyComponentSerializer.legacyAmpersand()
+                .deserialize(TranslationFileReader.catchableListTitle);
+        Inventory catchableInventory = Bukkit.createInventory(player, 54, inventoryTitle);
         head.clear();
 
         for (String entity : entityList) {
             ItemStack skull = new HeadDrop().skullTextures(new ItemStack(Material.PLAYER_HEAD), entityFile, entity);
             ItemMeta skullMeta = skull.getItemMeta();
 
-            // Use string comparison instead of EntityType.valueOf()
-            String catchable = isEntityCatchable(entity) ? "&aTRUE" : "&cFALSE";
-            skullMeta.setDisplayName(ChatColor.WHITE + entity);
+            // Create catchable status component
+            Component catchableComponent = isEntityCatchable(entity)
+                    ? Component.text("TRUE").color(NamedTextColor.GREEN)
+                    : Component.text("FALSE").color(NamedTextColor.RED);
 
-            List<String> lore = new ArrayList<>();
+            // Set display name using Component
+            Component entityDisplayName = Component.text(entity).color(NamedTextColor.WHITE);
+            skullMeta.displayName(entityDisplayName);
+
+            // Create lore using Components
+            List<Component> loreComponents = new ArrayList<>();
+            String entityDisplayNameFromConfig = entityFile.getString("EntityList." + entity + ".DisplayName");
+
             for (String line : TranslationFileReader.guiSkullLore) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', line.replace("{ENTITY}", ChatColor.AQUA + entityFile.getString("EntityList." + entity + ".DisplayName")).replace("{CATCHABLE}", catchable)));
+                // Replace placeholders and convert to Component
+                String processedLine = line
+                        .replace("{ENTITY}", entityDisplayNameFromConfig)
+                        .replace("{CATCHABLE}", isEntityCatchable(entity) ? "&aTRUE" : "&cFALSE");
+
+                Component loreComponent = LegacyComponentSerializer.legacyAmpersand()
+                        .deserialize(processedLine);
+                loreComponents.add(loreComponent);
             }
-            skullMeta.setLore(lore);
+
+            skullMeta.lore(loreComponents);
             skull.setItemMeta(skullMeta);
             head.add(skull);
         }

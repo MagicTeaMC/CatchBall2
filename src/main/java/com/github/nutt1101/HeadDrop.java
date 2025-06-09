@@ -3,7 +3,9 @@ package com.github.nutt1101;
 import com.github.nutt1101.event.HitEvent;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -16,21 +18,21 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class HeadDrop {
     private final Plugin plugin = CatchBall.plugin;
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
+    private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.legacyAmpersand();
 
     /**
      * When CatchBall hit catchable entity, It will drop the skull of hitEntity.
@@ -52,27 +54,35 @@ public class HeadDrop {
         String location = "(" + hitEntity.getWorld().getName() + ") " +
                 HitEvent.getCoordinate(hitEntity.getLocation());
 
-        if (hitEntity.getCustomName() != null) {
-            headMeta.setDisplayName(ChatColor.WHITE + hitEntity.getCustomName());
+        // Use Adventure API for display name
+        Component displayName;
+        if (hitEntity.customName() != null) {
+            displayName = Objects.requireNonNull(hitEntity.customName()).color(NamedTextColor.WHITE);
         } else {
-            headMeta.setDisplayName(ChatColor.WHITE + entityFile.getString("EntityList." + hitEntity.getType().toString() + ".DisplayName"));
+            String entityDisplayName = entityFile.getString("EntityList." + hitEntity.getType().toString() + ".DisplayName");
+            displayName = Component.text(entityDisplayName != null ? entityDisplayName : hitEntity.getType().toString())
+                    .color(NamedTextColor.WHITE);
         }
+        headMeta.displayName(displayName);
 
-        List<String> headLore = new ArrayList<>();
+        List<Component> headLore = new ArrayList<>();
 
-        if (player == null) {
-            headLore.addAll(TranslationFileReader.dropSkullLore.stream().map(lore -> ChatColor.translateAlternateColorCodes('&', lore).
-                    replace("{ENTITY}", hitEntity.getType().toString()).replace("{PLAYER}", "Dispenser").replace("{TIME}", format.format(now)).
-                    replace("{LOCATION}", location)).collect(Collectors.toList()));
-        } else {
-            headLore.addAll(TranslationFileReader.dropSkullLore.stream().map(lore -> ChatColor.translateAlternateColorCodes('&', lore).
-                    replace("{ENTITY}", hitEntity.getType().toString()).replace("{PLAYER}", player.getName()).replace("{TIME}", format.format(now)).
-                    replace("{LOCATION}", location)).collect(Collectors.toList()));
+        String playerName = (player == null) ? "Dispenser" : player.getName();
+
+        for (String lore : TranslationFileReader.dropSkullLore) {
+            String processedLore = lore
+                    .replace("{ENTITY}", hitEntity.getType().toString())
+                    .replace("{PLAYER}", playerName)
+                    .replace("{TIME}", format.format(now))
+                    .replace("{LOCATION}", location);
+
+            Component loreComponent = legacySerializer.deserialize(processedLore);
+            headLore.add(loreComponent);
         }
 
         headMeta = NBTHandler.saveEntityNBT(plugin, hitEntity, headMeta);
 
-        headMeta.setLore(headLore);
+        headMeta.lore(headLore);
         entityHead.setItemMeta(headMeta);
 
         return skullTextures(entityHead, entityFile, hitEntity.getType().toString());
@@ -89,31 +99,26 @@ public class HeadDrop {
         SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
 
         try {
-            PlayerProfile profile = Bukkit.createPlayerProfile("catchball");
-            PlayerTextures textures = profile.getTextures();
-
             String textureValue = entityFile.getString("EntityList." + entityType.toUpperCase() + ".Skull");
 
             if (textureValue != null && !textureValue.isEmpty()) {
                 try {
-                    String decodedValue = new String(Base64.getDecoder().decode(textureValue));
+                    // Create Paper's PlayerProfile
+                    PlayerProfile profile = Bukkit.createProfile("catchball");
 
-                    String urlStr = decodedValue.split("\"url\":\"")[1].split("\"")[0];
-                    URL textureUrl = new URL(urlStr);
+                    // Set the texture property directly
+                    ProfileProperty textureProperty = new ProfileProperty("textures", textureValue);
+                    profile.setProperty(textureProperty);
 
-                    textures.setSkin(textureUrl);
-                    profile.setTextures(textures);
-
-                    skullMeta.setOwnerProfile(profile);
+                    skullMeta.setPlayerProfile(profile);
                 } catch (Exception e) {
-                    plugin.getLogger().log(Level.WARNING, "Failed to decode texture value: " + e.getMessage());
+                    plugin.getLogger().log(Level.WARNING, "Failed to set texture property: " + e.getMessage());
                 }
             } else {
                 plugin.getLogger().log(Level.WARNING, "Could not find texture value for entity type: " + entityType);
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Failed to set skull texture: " + e.getMessage());
-            e.printStackTrace();
         }
 
         head.setItemMeta(skullMeta);

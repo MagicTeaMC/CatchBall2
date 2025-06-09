@@ -51,55 +51,49 @@ public class SkullClick implements Listener{
             if (data.has(new NamespacedKey(plugin, "skullData"), PersistentDataType.STRING)) {
                 String path = data.get(new NamespacedKey(plugin, "skullData"), PersistentDataType.STRING).toString();
 
-                if (path == null) {
-                    player.sendMessage(ConfigSetting.toChat(TranslationFileReader.skullDoesNotFound, "", ""));
+                if (!new HitEvent().resCheck(player, event.getClickedBlock().getLocation())) {
                     event.setCancelled(true);
-                } else {
-                    if (!new HitEvent().resCheck(player, event.getClickedBlock().getLocation())) {
-                        event.setCancelled(true);
-                        return;
-                    }
+                    return;
+                }
 
-                    if (!new HitEvent().gfCheck(player, event.getClickedBlock().getLocation())) {
-                        event.setCancelled(true);
-                        return;
-                    }
+                if (!new HitEvent().gfCheck(player, event.getClickedBlock().getLocation())) {
+                    event.setCancelled(true);
+                    return;
+                }
 
-                    try {
-                        // Use safe method to get EntityType
-                        String entityTypeString = data.get(new NamespacedKey(plugin, "entityType"), PersistentDataType.STRING);
-                        EntityType entityType = getEntityType(entityTypeString);
+                try {
+                    // Use safe method to get EntityType
+                    String entityTypeString = data.get(new NamespacedKey(plugin, "entityType"), PersistentDataType.STRING);
+                    EntityType entityType = getEntityType(entityTypeString);
 
-                        Location clickLocation = event.getClickedBlock().getLocation();
+                    Location clickLocation = event.getClickedBlock().getLocation();
 
-                        clickLocation.setX(clickLocation.getBlockX() + 0.5);
-                        clickLocation.setZ(clickLocation.getBlockZ() + 0.5);
+                    clickLocation.setX(clickLocation.getBlockX() + 0.5);
+                    clickLocation.setZ(clickLocation.getBlockZ() + 0.5);
 
-                        for (int i=0; i < 3; i++) {
-                            if (clickLocation.getBlock().getType().equals(Material.AIR) || clickLocation.getBlock().getType().equals(Material.WATER)) { break; }
-                            clickLocation.setY(clickLocation.getY() + 1D);
+                    for (int i = 0; true; i++) {
+                        if (clickLocation.getBlock().getType().equals(Material.AIR) || clickLocation.getBlock().getType().equals(Material.WATER)) { break; }
+                        clickLocation.setY(clickLocation.getY() + 1D);
 
-                            if (i == 2) {
-                                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.locationUnsafe, "", ""));
-                                event.setCancelled(true);
-                                return;
-                            }
+                        if (i == 2) {
+                            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.locationUnsafe, "", ""));
+                            event.setCancelled(true);
+                            return;
                         }
-
-                        Entity entity = player.getWorld().spawnEntity(clickLocation, entityType);
-
-                        Location location = clickLocation.clone();
-                        location.setX(location.getBlockX() + 0.5);
-                        location.setZ(location.getBlockZ() + 0.5);
-
-                        NBTHandler.loadEntityNBT(plugin, entity, data);
-                        PlayerSchedulerUtil.teleport(entity, location);
-
-                        event.getItem().setAmount(0);
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
 
+                    Entity entity = player.getWorld().spawnEntity(clickLocation, entityType);
+
+                    Location location = clickLocation.clone();
+                    location.setX(location.getBlockX() + 0.5);
+                    location.setZ(location.getBlockZ() + 0.5);
+
+                    NBTHandler.loadEntityNBT(plugin, entity, data);
+                    PlayerSchedulerUtil.teleport(entity, location);
+
+                    event.getItem().setAmount(0);
+                } catch (Exception e) {
+                    plugin.getLogger().warning(e.getMessage());
                 }
 
             }

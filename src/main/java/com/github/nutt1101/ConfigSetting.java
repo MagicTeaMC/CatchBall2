@@ -4,7 +4,8 @@ import com.bekvon.bukkit.residence.containers.Flags;
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -90,26 +90,26 @@ public class ConfigSetting {
         DropEnable = !config.isSet("DropEnable") || config.getBoolean("DropEnable");
         DropNeedPermission = config.isSet("DropNeedPermission") && config.getBoolean("DropNeedPermission");
         DropItemChance = config.isSet("DropItemChance")
-                ? Integer.parseInt(config.getString("DropItemChance").replace("%", ""))
+                ? Integer.parseInt(Objects.requireNonNull(config.getString("DropItemChance")).replace("%", ""))
                 : 50;
         try {
             DropItemMaterial = config.isSet("DropItemMaterial") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropItemMaterial"))) : Material.EGG;
         } catch (IllegalArgumentException e) {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
+            plugin.getLogger().log(Level.WARNING, "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
             DropItemMaterial = Material.EGG;
         }
 
         try {
-            DropMethod = config.isSet("DropMethod") ? DropMethodType.valueOf(config.getString("DropMethod").toUpperCase()) : DropMethodType.CHICKEN;
+            DropMethod = config.isSet("DropMethod") ? DropMethodType.valueOf(Objects.requireNonNull(config.getString("DropMethod")).toUpperCase()) : DropMethodType.CHICKEN;
         } catch (IllegalArgumentException e) {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
+            plugin.getLogger().log(Level.WARNING, "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
             DropMethod = DropMethodType.CHICKEN;
         }
 
         // Store as string instead of EntityType
-        DropEntityType = config.isSet("DropEntityType") ? config.getString("DropEntityType").toUpperCase() : "CHICKEN";
+        DropEntityType = config.isSet("DropEntityType") ? Objects.requireNonNull(config.getString("DropEntityType")).toUpperCase() : "CHICKEN";
         if (!isValidEntityType(DropEntityType)) {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropEntityType in config.yml, using default 'CHICKEN'.");
+            plugin.getLogger().log(Level.WARNING, "Invalid DropEntityType in config.yml, using default 'CHICKEN'.");
             DropEntityType = "CHICKEN";
         }
 
@@ -119,16 +119,16 @@ public class ConfigSetting {
 
         entityFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "entity.yml"));
 
-        catchSuccessSound = config.isSet("CatchSuccessSound") ? config.getString("CatchSuccessSound").toUpperCase()
+        catchSuccessSound = config.isSet("CatchSuccessSound") ? Objects.requireNonNull(config.getString("CatchSuccessSound")).toUpperCase()
                 : "ENTITY_ARROW_HIT_PLAYER".toUpperCase();
 
         recipeEnabled = !config.isSet("Recipe.enabled") || config.getBoolean("Recipe.enabled");
 
         residenceFlag = config.isSet("ResidenceFlag") ? config.getStringList("ResidenceFlag")
-                : Arrays.asList("animalkilling");
+                : List.of("animalkilling");
 
         griefPreventionFlag = config.isSet("GriefPreventionFlag") ? config.getStringList("GriefPreventionFlag")
-                : Arrays.asList("Access");
+                : List.of("Access");
         allowCatchableTamedOwnerIsNull = !config.isSet("AllowCatchableTamedOwnerIsNull")
                 || config.getBoolean("AllowCatchableTamedOwnerIsNull");
         ShowParticles = !config.isSet("ShowParticles")
@@ -145,11 +145,11 @@ public class ConfigSetting {
         try {
             TranslationFileReader.init();
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().warning("An error caused " + e.getMessage());
             plugin.getLogger().log(Level.WARNING,
-                    ChatColor.RED + String.format("The locale you have selected '%s' is currently not supported",
+                    String.format("The locale you have selected '%s' is currently not supported",
                             locale));
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "We only support: en, zh_tw");
+            plugin.getLogger().log(Level.WARNING, "We only support: en, zh_tw");
             locale = "en";
         }
 
@@ -161,14 +161,14 @@ public class ConfigSetting {
 
         try {
             if (plugin.getServer().getPluginManager().getPlugin("Residence") != null) {
-                residenceFlag = residenceFlag.stream().map(flag -> Flags.valueOf(flag)).map(Flags::name)
+                residenceFlag = residenceFlag.stream().map(Flags::valueOf).map(Flags::name)
                         .collect(Collectors.toList());
             }
 
         } catch (IllegalArgumentException e) {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + e.getMessage());
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Unknown Residence flag!");
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Please check your config setting!");
+            plugin.getLogger().log(Level.WARNING, e.getMessage());
+            plugin.getLogger().log(Level.WARNING, "Unknown Residence flag!");
+            plugin.getLogger().log(Level.WARNING, "Please check your config setting!");
             residenceFlag.clear();
             residenceFlag.add("animalkilling");
         }
@@ -178,15 +178,15 @@ public class ConfigSetting {
                 griefPreventionFlag = griefPreventionFlag.stream()
                         .map(flag -> flag.substring(0, 1).toUpperCase() + flag.substring(1))
                         .map(String::toUpperCase).collect(Collectors.toList());
-                for (int i = 0; i < griefPreventionFlag.size(); i++) {
-                    ClaimPermission.valueOf(griefPreventionFlag.get(i));
+                for (String s : griefPreventionFlag) {
+                    ClaimPermission.valueOf(s);
                 }
             }
 
         } catch (IllegalArgumentException e) {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + e.getMessage());
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Unknown GriefPrevention flag!");
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Please check your config setting!");
+            plugin.getLogger().log(Level.WARNING, e.getMessage());
+            plugin.getLogger().log(Level.WARNING, "Unknown GriefPrevention flag!");
+            plugin.getLogger().log(Level.WARNING, "Please check your config setting!");
             griefPreventionFlag.clear();
             griefPreventionFlag.add("Access");
         }
@@ -197,7 +197,7 @@ public class ConfigSetting {
             if (isValidEntityType(entityName)) {
                 catchableEntity.add(entityName);
             } else {
-                plugin.getLogger().log(Level.WARNING, ChatColor.YELLOW + "Unknown entity type '" + entity + "' in CatchableEntity list, skipping...");
+                plugin.getLogger().log(Level.WARNING, "Unknown entity type '" + entity + "' in CatchableEntity list, skipping...");
             }
         }
 
@@ -246,10 +246,10 @@ public class ConfigSetting {
                 outputStream.close();
                 inputStream.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                plugin.getLogger().warning("An error caused " + e.getMessage());
             }
         } else {
-            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Unknown Error make plugin file can not place!");
+            plugin.getLogger().log(Level.WARNING, "Unknown Error make plugin file can not place!");
         }
     }
 
@@ -260,7 +260,7 @@ public class ConfigSetting {
      * @return entityDisplayName
      */
     public static String getEntityDisplayName(String entityName) {
-        if (entityFile.getConfigurationSection("EntityList").contains(entityName)) {
+        if (Objects.requireNonNull(entityFile.getConfigurationSection("EntityList")).contains(entityName)) {
             return entityFile.getString("EntityList." + entityName.toUpperCase() + ".DisplayName");
         }
         return entityName;
@@ -269,17 +269,20 @@ public class ConfigSetting {
     /**
      * Replace the message argument from config.yml.
      *
+     * @param message  the source message with placeholders
      * @param location replace {LOCATION} from source message
      * @param entity   replace {ENTITY} from source message
-     * @return replaced message
+     * @return Component ready to send to player
      */
-    public static String toChat(String message, String location, String entity) {
+    public static Component toChat(String message, String location, String entity) {
+        // Replace placeholders
         message = message.contains("{BALL}") ? message.replace("{BALL}", TranslationFileReader.catchBallName)
                 : message;
         message = message.contains("{LOCATION}") ? message.replace("{LOCATION}", location) : message;
         message = message.contains("{ENTITY}") ? message.replace("{ENTITY}", getEntityDisplayName(entity)) : message;
 
-        return ChatColor.translateAlternateColorCodes('&', message);
+        // Parse with MiniMessage
+        return MiniMessage.miniMessage().deserialize(message);
     }
 
     /**
@@ -294,29 +297,8 @@ public class ConfigSetting {
         try {
             fileConfiguration.save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "An error caused " + e.getMessage());
         }
-    }
-
-    public static boolean isLatestVersion(String current, String latest) {
-
-        String[] currentParts = current.split("\\.");
-
-        String[] latestParts = latest.split("\\.");
-
-        int minLength = Math.min(currentParts.length, latestParts.length);
-
-        for (int i = 0; i < minLength; i++) {
-
-            int currentPart = Integer.parseInt(currentParts[i]);
-
-            int latestPart = Integer.parseInt(latestParts[i]);
-
-            if (currentPart < latestPart) return false;
-
-            if (currentPart > latestPart) return true;
-        }
-        return currentParts.length >= latestParts.length;
     }
 
     public enum DropMethodType {

@@ -37,7 +37,7 @@ import java.util.Objects;
 
 
 public class HitEvent implements Listener {
-    private List<String> catchableEntity = ConfigSetting.catchableEntity; // Changed from EntityType to String
+    private final List<String> catchableEntity = ConfigSetting.catchableEntity; // Changed from EntityType to String
     private Location hitLocation;
     private final Plugin plugin = CatchBall.plugin;
     private final String[] mmPackage = {"io.lumine.mythic.bukkit.BukkitAPIHelper", "io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper"};
@@ -72,15 +72,16 @@ public class HitEvent implements Listener {
         }
 
         // check if shooter is a player
-        if (event.getEntity().getShooter() instanceof Player) {
-            Player player = (Player) event.getEntity().getShooter();
+        if (event.getEntity().getShooter() instanceof Player player) {
 
             if (!checkCatchBall(event.getEntity())) { return; }
 
             if (!player.hasPermission("catchball.use")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
-                        getCoordinate(event.getHitBlock() == null ? Objects.requireNonNull(event.getHitEntity()).getLocation() : event.getHitBlock().getLocation())
-                        , "").replace("{BALL}", TranslationFileReader.catchBallName)));
+                player.sendMessage(ConfigSetting.toChat(
+                        TranslationFileReader.noPermissionToUse.replace("{BALL}", TranslationFileReader.catchBallName),
+                        getCoordinate(event.getHitBlock() == null ? Objects.requireNonNull(event.getHitEntity()).getLocation() : event.getHitBlock().getLocation()),
+                        ""
+                ));
 
                 event.getEntity().remove();
 
@@ -100,7 +101,7 @@ public class HitEvent implements Listener {
             event.getEntity().remove();
             // hit a entity
             if (event.getHitEntity() != null) {
-                handleEntityCatch(player, event.getHitEntity(), true);
+                handleEntityCatch(player, event.getHitEntity());
                 // hit block, catchBall will be return
             } else if (event.getHitBlock() != null) {
 
@@ -167,8 +168,8 @@ public class HitEvent implements Listener {
 
         // Check permissions
         if (!player.hasPermission("catchball.use")) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
-                    getCoordinate(targetEntity.getLocation()), "").replace("{BALL}", TranslationFileReader.catchBallName)));
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermissionToUse.replace("{BALL}", TranslationFileReader.catchBallName),
+                    getCoordinate(targetEntity.getLocation()), ""));
             return;
         }
 
@@ -182,10 +183,10 @@ public class HitEvent implements Listener {
         }
 
         // Handle the entity catch
-        handleEntityCatch(player, targetEntity, false);
+        handleEntityCatch(player, targetEntity);
     }
 
-    private void handleEntityCatch(Player player, Entity hitEntity, boolean isProjectile) {
+    private void handleEntityCatch(Player player, Entity hitEntity) {
         hitLocation = hitEntity.getLocation();
 
         // Check all protection plugins
@@ -195,7 +196,7 @@ public class HitEvent implements Listener {
             return;
         }
 
-        if (!mmCheck(player, hitEntity) && ConfigSetting.UseMM) {
+        if (!mmCheck(hitEntity) && ConfigSetting.UseMM) {
             hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
             player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
             return;
@@ -238,11 +239,11 @@ public class HitEvent implements Listener {
             return;
         }*/
 
-        // Check if entity is tameable and owned by someone else
+        // Check if entity is tamable and owned by someone else
         if (hitEntity instanceof Tameable tameable) {
             if (tameable.isTamed()) {
                 boolean isNullOwnerValue = tameable.getOwner() == null;
-                boolean sameOwner = isNullOwnerValue ? true : tameable.getOwner().getName().equals(player.getName());
+                boolean sameOwner = isNullOwnerValue || Objects.equals(tameable.getOwner().getName(), player.getName());
                 if ((isNullOwnerValue && !ConfigSetting.allowCatchableTamedOwnerIsNull) || !sameOwner) {
                     hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
                     player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
@@ -264,7 +265,11 @@ public class HitEvent implements Listener {
 
             // Success sound
             if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
-                player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
+                NamespacedKey soundKey = NamespacedKey.fromString(ConfigSetting.catchSuccessSound.toLowerCase());
+                assert soundKey != null;
+                Sound sound = Registry.SOUNDS.get(soundKey);
+                assert sound != null;
+                player.playSound(player.getLocation(), sound, 1f, 1f);
             }
 
             // Remove the entity and drop the head
@@ -314,8 +319,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.residenceFlag) {
             if (!residence.getPermissions().playerHas(player, Flags.valueOf(flags.toLowerCase()) , true)) {
 
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "").
-                        replace("{FLAG}", flags));
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions.replace("{FLAG}", flags), "", ""));
 
                 return false;
             }
@@ -324,7 +328,7 @@ public class HitEvent implements Listener {
         return true;
     }
 
-    public boolean mmCheck(Player player, Entity entity) {
+    public boolean mmCheck(Entity entity) {
         if (plugin.getServer().getPluginManager().getPlugin("MythicMobs") == null) { return true; }
 
         for (int i=0 ; i < 2; i++) {
@@ -336,6 +340,7 @@ public class HitEvent implements Listener {
 
                 return !((boolean) isMythicMob.invoke(ins, entity));
             } catch (Exception e) {
+                plugin.getLogger().warning("An error caused " + e.getMessage());
             }
         }
 
@@ -347,11 +352,7 @@ public class HitEvent implements Listener {
         LandWorld world = api.getWorld(hitLocation.getWorld());
 
         if (world != null) { // Lands is enabled in this world
-            if (world.hasFlag(player, hitLocation, null, me.angeschossen.lands.api.flags.Flags.ATTACK_ANIMAL, false)) {
-                return true;
-            } else {
-                return false;
-            }
+            return world.hasFlag(player, hitLocation, null, me.angeschossen.lands.api.flags.Flags.ATTACK_ANIMAL, false);
         }
 
         return true;
@@ -374,8 +375,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.griefPreventionFlag) {
             if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
                 player.sendMessage(ConfigSetting.toChat(
-                                TranslationFileReader.noResidencePermissions, "", "")
-                        .replace("{FLAG}", flags));
+                                TranslationFileReader.noResidencePermissions.replace("{FLAG}", flags), "", ""));
 
                 return false;
             }
@@ -418,20 +418,14 @@ public class HitEvent implements Listener {
 
     public boolean townyCheck(Player player, Location location) {
         if (plugin.getServer().getPluginManager().getPlugin("Towny") == null) { return true; }
-        boolean bBuild = PlayerCacheUtil.getCachePermission(player, location, Material.valueOf("dirt"), TownyPermission.ActionType.BUILD);
-        return bBuild;
+        return PlayerCacheUtil.getCachePermission(player, location, Material.valueOf("dirt"), TownyPermission.ActionType.BUILD);
     }
 
 
     public boolean checkCatchBall(Projectile projectile) {
-        if (!(projectile instanceof Snowball)) { return false; }
+        if (!(projectile instanceof Snowball throwableProjectile)) { return false; }
 
-        if (projectile instanceof ThrowableProjectile) {
-            ThrowableProjectile throwableProjectile = (ThrowableProjectile) projectile;
-            if (!Objects.requireNonNull(throwableProjectile.getItem().getItemMeta()).equals(Ball.makeBall().getItemMeta())) { return false; }
-        }
-
-        return true;
+        return Objects.requireNonNull(throwableProjectile.getItem().getItemMeta()).equals(Ball.makeBall().getItemMeta());
     }
 
     public String getIsCustomEntity(Entity hitEntity) {

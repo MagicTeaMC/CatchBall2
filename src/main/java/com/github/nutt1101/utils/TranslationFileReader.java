@@ -79,12 +79,7 @@ public class TranslationFileReader {
           }
 
           if (!localeFile.exists()) {
-               File localeDir = new File(localeFile.getParent());
-               if (!localeDir.exists()) {
-                    localeDir.mkdirs();
-               }
-
-               FileOutputStream outputStream = new FileOutputStream(localeFile);
+              FileOutputStream outputStream = new FileOutputStream(localeFile);
                inputStream.transferTo(outputStream);
                outputStream.close();
           }
