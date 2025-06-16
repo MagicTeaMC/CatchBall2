@@ -64,7 +64,7 @@ dependencies {
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
