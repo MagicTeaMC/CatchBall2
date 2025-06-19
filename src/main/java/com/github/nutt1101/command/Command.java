@@ -140,7 +140,7 @@ public class Command implements CommandExecutor {
                 givePlayerItem(player, checkItem(args[2]), itemAmount);
 
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
-                        .replace("{ITEM}", args[2].toLowerCase().equals("catchball") ? TranslationFileReader.catchBallName
+                        .replace("{ITEM}", args[2].equalsIgnoreCase("catchball") ? TranslationFileReader.catchBallName
                                 : TranslationFileReader.dropItemName)
                         .replace("{PLAYER}", player.getName())
                         .replace("&", "§"));
