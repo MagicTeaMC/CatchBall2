@@ -35,7 +35,9 @@ public class TabComplete implements TabCompleter {
                 if (args[0].equalsIgnoreCase("give")) {
                     List<String> playerNames = new ArrayList<>();
                     Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
-                    StringUtil.copyPartialMatches(args[1], playerNames, sort);
+
+                    // search for player names
+                    searchPlayerNames(args[1], playerNames, sort);
                     sort.sort(String.CASE_INSENSITIVE_ORDER);
                     return sort;
                 } else if (args[0].equalsIgnoreCase("add")) {
@@ -96,6 +98,36 @@ public class TabComplete implements TabCompleter {
         }
 
         return List.of("");
+    }
+
+    /**
+     * Player name search
+     * @param input The partial input from the user
+     * @param playerNames List of all available player names
+     * @param results List to add matching results to
+     */
+    private void searchPlayerNames(String input, List<String> playerNames, List<String> results) {
+        if (input == null || input.isEmpty()) {
+            results.addAll(playerNames);
+            return;
+        }
+
+        String lowerInput = input.toLowerCase();
+
+        // First add exact prefix matches (higher priority)
+        for (String playerName : playerNames) {
+            if (playerName.toLowerCase().startsWith(lowerInput)) {
+                results.add(playerName);
+            }
+        }
+
+        // Then add substring matches that aren't already included
+        for (String playerName : playerNames) {
+            String lowerPlayerName = playerName.toLowerCase();
+            if (lowerPlayerName.contains(lowerInput) && !lowerPlayerName.startsWith(lowerInput)) {
+                results.add(playerName);
+            }
+        }
     }
 
     /**
