@@ -14,9 +14,6 @@ import com.github.nutt1101.utils.TranslationFileReader;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import fr.xyness.SCS.API.SimpleClaimSystemAPI;
-import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
-import me.angeschossen.lands.api.LandsIntegration;
 import me.angeschossen.lands.api.land.LandWorld;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
@@ -42,10 +39,6 @@ public class HitEvent implements Listener {
     private final Plugin plugin = CatchBall.plugin;
     private final String[] mmPackage = {"io.lumine.mythic.bukkit.BukkitAPIHelper", "io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper"};
 
-    LandsIntegration api;
-    WorldGuardPlugin worldGuard;
-    private SimpleClaimSystemAPI scs;
-
     /**
      * Check if an entity is catchable by comparing string names
      */
@@ -54,26 +47,10 @@ public class HitEvent implements Listener {
         return catchableEntity.contains(entityName);
     }
 
-    /* private final EntityType[] blockEntity = {EntityType.ARROW, EntityType.AREA_EFFECT_CLOUD, EntityType.MINECART_COMMAND,
-        EntityType.EGG, EntityType.DRAGON_FIREBALL, EntityType.ENDER_PEARL, EntityType.THROWN_EXP_BOTTLE , EntityType.EXPERIENCE_ORB,
-        EntityType.ENDER_SIGNAL, EntityType.FALLING_BLOCK, EntityType.FIREBALL, EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME,
-        EntityType.DROPPED_ITEM, EntityType.THROWN_EXP_BOTTLE, EntityType.SHULKER_BULLET , EntityType.SMALL_FIREBALL , EntityType.SNOWBALL,
-        EntityType.PRIMED_TNT, EntityType.TRIDENT, EntityType.PLAYER};   */
-
     @EventHandler
     public void CatchBallHitEvent(ProjectileHitEvent event){
-
-        if(plugin.getServer().getPluginManager().getPlugin("Lands") != null) {
-            api = LandsIntegration.of(plugin);
-        }
-
-        if(plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") != null) {
-            scs = SimpleClaimSystemAPI_Provider.getAPI();
-        }
-
         // check if shooter is a player
-        if (event.getEntity().getShooter() instanceof Player) {
-            Player player = (Player) event.getEntity().getShooter();
+        if (event.getEntity().getShooter() instanceof Player player) {
 
             if (!checkCatchBall(event.getEntity())) { return; }
 
@@ -121,7 +98,7 @@ public class HitEvent implements Listener {
             event.getEntity().remove();
             // hit a entity
             if (event.getHitEntity() != null) {
-                Entity hitEntity = (Entity) event.getHitEntity();
+                Entity hitEntity = event.getHitEntity();
                 hitLocation = hitEntity.getLocation();
 
                 String checkCustom = getIsCustomEntity(hitEntity);
@@ -151,15 +128,6 @@ public class HitEvent implements Listener {
         Entity targetEntity = event.getRightClicked();
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
-        // Initialize APIs if plugins are present
-        if(plugin.getServer().getPluginManager().getPlugin("Lands") != null) {
-            api = LandsIntegration.of(plugin);
-        }
-
-        if(plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") != null) {
-            scs = SimpleClaimSystemAPI_Provider.getAPI();
-        }
-
         // Check if player is holding a catch ball
         if (!isCatchBall(itemInHand)) {
             return;
@@ -188,7 +156,7 @@ public class HitEvent implements Listener {
     private void handleEntityCatch(Player player, Entity hitEntity, boolean isProjectile) {
         hitLocation = hitEntity.getLocation();
 
-        // Check all protection plugins
+        // Check all protection plugins using static flags
         if (!resCheck(player, hitEntity.getLocation()) && ConfigSetting.UseRes) {
             hitEntity.getWorld().dropItem(hitEntity.getLocation(), Ball.makeBall());
             player.sendMessage(ConfigSetting.toChat(TranslationFileReader.canNotCatchable, getCoordinate(hitEntity.getLocation()), ""));
@@ -303,7 +271,7 @@ public class HitEvent implements Listener {
     }
 
     public boolean resCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("Residence") == null) { return true; }
+        if (!CatchBall.hasResidence) { return true; }
 
         if (ResidenceApi.getResidenceManager().getByLoc(location) == null) { return true; }
 
@@ -325,7 +293,7 @@ public class HitEvent implements Listener {
     }
 
     public boolean mmCheck(Player player, Entity entity) {
-        if (plugin.getServer().getPluginManager().getPlugin("MythicMobs") == null) { return true; }
+        if (!CatchBall.hasMythicMobs) { return true; }
 
         for (int i=0 ; i < 2; i++) {
             try {
@@ -343,8 +311,9 @@ public class HitEvent implements Listener {
     }
 
     public boolean landsCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("Lands") == null) { return true; }
-        LandWorld world = api.getWorld(hitLocation.getWorld());
+        if (!CatchBall.hasLands) { return true; }
+
+        LandWorld world = CatchBall.landsAPI.getWorld(hitLocation.getWorld());
 
         if (world != null) { // Lands is enabled in this world
             if (world.hasFlag(player, hitLocation, null, me.angeschossen.lands.api.flags.Flags.ATTACK_ANIMAL, false)) {
@@ -358,7 +327,7 @@ public class HitEvent implements Listener {
     }
 
     public boolean gfCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("GriefPrevention") == null) {return true;}
+        if (!CatchBall.hasGriefPrevention) {return true;}
 
         Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
         if (claim == null) {
@@ -384,14 +353,15 @@ public class HitEvent implements Listener {
     }
 
     public boolean rpCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("RedProtect") == null) { return true; }
+        if (!CatchBall.hasRedProtect) { return true; }
         Region r = RedProtect.get().getAPI().getRegion(player.getLocation());
         return r != null && r.canSpawnPassives(player);
     }
 
     public boolean scsCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("SimpleClaimSystem") == null) { return true; }
-        fr.xyness.SCS.Types.Claim claim = scs.getClaimAtChunk(getChunkFromLocation(location));
+        if (!CatchBall.hasSimpleClaimSystem) { return true; }
+
+        fr.xyness.SCS.Types.Claim claim = CatchBall.scsAPI.getClaimAtChunk(getChunkFromLocation(location));
         if (claim != null) {
             return claim.getPermission(player.getName(), null);
         }
@@ -406,7 +376,7 @@ public class HitEvent implements Listener {
 
     // TODO
     /* public boolean wgCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("WorldGuard") == null) {
+        if (!CatchBall.hasWorldGuard) {
             return true;
         }
 
@@ -417,11 +387,10 @@ public class HitEvent implements Listener {
     } */
 
     public boolean townyCheck(Player player, Location location) {
-        if (plugin.getServer().getPluginManager().getPlugin("Towny") == null) { return true; }
+        if (!CatchBall.hasTowny) { return true; }
         boolean bBuild = PlayerCacheUtil.getCachePermission(player, location, Material.valueOf("dirt"), TownyPermission.ActionType.BUILD);
         return bBuild;
     }
-
 
     public boolean checkCatchBall(Projectile projectile) {
         if (!(projectile instanceof Snowball)) { return false; }
