@@ -62,6 +62,7 @@ dependencies {
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
     api("de.tr7zw:item-nbt-api:2.15.1-20250619.003022-5")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
+    api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
@@ -117,7 +118,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.4")
+    minecraftVersion("1.21.5")
 }
 
 runPaper.folia.registerTask()

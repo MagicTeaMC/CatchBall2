@@ -3,6 +3,7 @@ package com.github.nutt1101;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
+import com.tchristofferson.configupdater.ConfigUpdater;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -75,16 +76,51 @@ public class ConfigSetting {
      * Initialize or reload the plugin
      */
     public static void checkConfig() {
-        // check if the file exists
+        // Save default config if it doesn't exist
         if (!new File(plugin.getDataFolder(), "config.yml").exists()) {
             plugin.saveResource("config.yml", false);
         }
 
+        // Update the config file using ConfigUpdater
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        try {
+            ConfigUpdater.update(plugin, "config.yml", configFile, Arrays.asList(
+                    // Preserve user-configured entity list
+                    "CatchableEntity",
+
+                    // Preserve user's drop settings
+                    "DropItemMaterial",
+                    "DropItemChance",
+                    "DropMethod",
+                    "DropEntityType",
+                    "DropBlockType",
+
+                    // Preserve integration settings the user has configured
+                    "UseRes",
+                    "UseGF",
+                    "UseLands",
+                    "UsePAPI",
+                    "UseMM",
+                    "UseRP",
+                    "UseSCS",
+                    "UseTowny",
+
+                    // Preserve user's locale choice
+                    "Locale",
+
+                    // Preserve custom flags if user has modified them
+                    "ResidenceFlag",
+                    "GriefPreventionFlag"
+            ));
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not update config.yml", e);
+        }
+
+        // Reload config after updating
         plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
 
         locale = config.isSet("Locale") ? config.getString("Locale") : "en";
-
         entityFileCreate();
 
         DropEnable = !config.isSet("DropEnable") || config.getBoolean("DropEnable");
