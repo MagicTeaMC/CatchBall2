@@ -15,22 +15,22 @@ import java.util.Set;
 
 public class TabComplete implements TabCompleter {
     List<String> entityList = new ArrayList<>();
-    
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        
+
         // tabComplete will be show suggest arument to commandSender
         if (command.getName().equals("ctb")) {
             final List<String> sort = new ArrayList<>();
-            
+
             if (!sender.hasPermission("catchball.op")) { return List.of(""); }
-            
-            if (args.length == 1) { 
+
+            if (args.length == 1) {
                 StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument(), sort);
-                return sort; 
+                return sort;
             }
 
-            if (args.length == 2) { 
+            if (args.length == 2) {
                 entityList.clear();
                 if (args[0].equalsIgnoreCase("give")) {
                     List<String> playerNames = new ArrayList<>();
@@ -41,23 +41,42 @@ public class TabComplete implements TabCompleter {
                 } else if (args[0].equalsIgnoreCase("add")) {
                     Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
 
-                    allEntityList.stream().
-                            filter(entityName -> !ConfigSetting.catchableEntity.contains(EntityType.valueOf(entityName))).
-                            forEach(entity -> entityList.add(entity));
-                    
-                    if (ConfigSetting.catchableEntity.size() < entityList.size()) { entityList.add("ALL"); }
+                    // Use traditional for loop instead of streams for better compatibility
+                    int availableToAdd = 0;
+                    for (String entityName : allEntityList) {
+                        EntityType entityType = safeGetEntityType(entityName);
+                        if (entityType != null && !ConfigSetting.catchableEntity.contains(entityType)) {
+                            entityList.add(entityName);
+                            availableToAdd++;
+                        }
+                    }
+
+                    // Only show "ALL" if there are entities that can actually be added
+                    if (availableToAdd > 1) {
+                        entityList.add("ALL");
+                    }
 
                     StringUtil.copyPartialMatches(args[1], entityList, sort);
                     return sort;
 
                 } else if (args[0].equalsIgnoreCase("remove")) {
 
-                    ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false).stream().
-                        filter(entityName -> ConfigSetting.catchableEntity.contains(EntityType.valueOf(entityName))).
-                        forEach(entity -> entityList.add(entity));
-                    
-                    if (ConfigSetting.catchableEntity.size() > 0) { entityList.add("ALL"); }
-                    
+                    // Use traditional for loop instead of streams for better compatibility
+                    Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
+                    int availableToRemove = 0;
+                    for (String entityName : allEntityList) {
+                        EntityType entityType = safeGetEntityType(entityName);
+                        if (entityType != null && ConfigSetting.catchableEntity.contains(entityType)) {
+                            entityList.add(entityName);
+                            availableToRemove++;
+                        }
+                    }
+
+                    // Only show "ALL" if there are entities that can actually be removed
+                    if (availableToRemove > 0) {
+                        entityList.add("ALL");
+                    }
+
                     StringUtil.copyPartialMatches(args[1], entityList, sort);
                     return sort;
                 }
@@ -75,7 +94,21 @@ public class TabComplete implements TabCompleter {
                 }
             }
         }
-        
+
         return List.of("");
+    }
+
+    /**
+     * Safely gets EntityType from string, handling version compatibility
+     * @param entityName The entity name to convert
+     * @return EntityType if valid and exists in current version, null otherwise
+     */
+    private EntityType safeGetEntityType(String entityName) {
+        try {
+            return EntityType.valueOf(entityName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // Entity type doesn't exist in this Minecraft version
+            return null;
+        }
     }
 }
