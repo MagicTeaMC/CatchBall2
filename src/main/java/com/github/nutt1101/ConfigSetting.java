@@ -16,10 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -84,34 +81,7 @@ public class ConfigSetting {
         // Update the config file using ConfigUpdater
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         try {
-            ConfigUpdater.update(plugin, "config.yml", configFile, Arrays.asList(
-                    // Preserve user-configured entity list
-                    "CatchableEntity",
-
-                    // Preserve user's drop settings
-                    "DropItemMaterial",
-                    "DropItemChance",
-                    "DropMethod",
-                    "DropEntityType",
-                    "DropBlockType",
-
-                    // Preserve integration settings the user has configured
-                    "UseRes",
-                    "UseGF",
-                    "UseLands",
-                    "UsePAPI",
-                    "UseMM",
-                    "UseRP",
-                    "UseSCS",
-                    "UseTowny",
-
-                    // Preserve user's locale choice
-                    "Locale",
-
-                    // Preserve custom flags if user has modified them
-                    "ResidenceFlag",
-                    "GriefPreventionFlag"
-            ));
+            ConfigUpdater.update(plugin, "config.yml", configFile, Collections.emptyList());
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not update config.yml", e);
         }
