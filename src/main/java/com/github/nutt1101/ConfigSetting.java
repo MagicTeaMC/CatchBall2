@@ -1,33 +1,37 @@
 package com.github.nutt1101;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
 import com.bekvon.bukkit.residence.containers.Flags;
-
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
+import com.tchristofferson.configupdater.ConfigUpdater;
+import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;
     public static String locale;
     public static boolean updatecheck;
-    public static List<EntityType> catchableEntity = new ArrayList<>();
-    public static boolean chickenDropGoldEgg;
-    public static int chickenDropGoldEggChance;
+    public static List<String> catchableEntity = new ArrayList<>(); // Changed from EntityType to String
+    public static boolean DropEnable;
+    public static boolean DropNeedPermission;
+    public static DropMethodType DropMethod;
+    public static String DropEntityType; // Changed from EntityType to String
+    public static Material DropBlockType;
+    public static int DropItemChance;
+    public static Material DropItemMaterial;
     public static String catchSuccessSound;
     public static YamlConfiguration entityFile;
     public static boolean recipeEnabled;
@@ -48,35 +52,78 @@ public class ConfigSetting {
     public static boolean UseMM;
     public static boolean UseRP;
     public static boolean UseSCS;
+    public static boolean UseTowny;
 
     // TODO
     // public static boolean UseWG;
 
     /**
+     * Check if an entity type string is valid (exists in current server version)
+     */
+    private static boolean isValidEntityType(String entityName) {
+        try {
+            EntityType.valueOf(entityName.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
      * Initialize or reload the plugin
      */
     public static void checkConfig() {
-        // check if the file exists
+        // Save default config if it doesn't exist
         if (!new File(plugin.getDataFolder(), "config.yml").exists()) {
             plugin.saveResource("config.yml", false);
         }
 
+        // Update the config file using ConfigUpdater
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        try {
+            ConfigUpdater.update(plugin, "config.yml", configFile, Collections.emptyList());
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not update config.yml", e);
+        }
+
+        // Reload config after updating
         plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
 
         locale = config.isSet("Locale") ? config.getString("Locale") : "en";
-
         entityFileCreate();
 
-        chickenDropGoldEgg = !config.isSet("ChickenDropGoldEgg") || config.getBoolean("ChickenDropGoldEgg");
+        DropEnable = !config.isSet("DropEnable") || config.getBoolean("DropEnable");
+        DropNeedPermission = config.isSet("DropNeedPermission") && config.getBoolean("DropNeedPermission");
+        DropItemChance = config.isSet("DropItemChance")
+                ? Integer.parseInt(config.getString("DropItemChance").replace("%", ""))
+                : 50;
+        try {
+            DropItemMaterial = config.isSet("DropItemMaterial") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropItemMaterial"))) : Material.EGG;
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
+            DropItemMaterial = Material.EGG;
+        }
+
+        try {
+            DropMethod = config.isSet("DropMethod") ? DropMethodType.valueOf(config.getString("DropMethod").toUpperCase()) : DropMethodType.CHICKEN;
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
+            DropMethod = DropMethodType.CHICKEN;
+        }
+
+        // Store as string instead of EntityType
+        DropEntityType = config.isSet("DropEntityType") ? config.getString("DropEntityType").toUpperCase() : "CHICKEN";
+        if (!isValidEntityType(DropEntityType)) {
+            plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropEntityType in config.yml, using default 'CHICKEN'.");
+            DropEntityType = "CHICKEN";
+        }
+
+        DropBlockType = config.isSet("DropBlockType") ? Material.matchMaterial(Objects.requireNonNull(config.getString("DropBlockType"))) : Material.DIAMOND_ORE;
 
         updatecheck = !config.isSet("Update-Check") || config.getBoolean("Update-Check");
 
         entityFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "entity.yml"));
-
-        chickenDropGoldEggChance = config.isSet("ChickenDropGoldEggChance")
-                ? Integer.parseInt(config.getString("ChickenDropGoldEggChance").replace("%", ""))
-                : 50;
 
         catchSuccessSound = config.isSet("CatchSuccessSound") ? config.getString("CatchSuccessSound").toUpperCase()
                 : "ENTITY_ARROW_HIT_PLAYER".toUpperCase();
@@ -94,13 +141,12 @@ public class ConfigSetting {
                 || config.getBoolean("ShowParticles");
         CustomParticles = config.isSet("CustomParticles") ? config.getString("CustomParticles") : "CLOUD";
         catchFailRate = !config.isSet("catchFailRate") ? config.getDouble("catchFailRate")
-        : 0.1;
+                : 0.1;
         customModelData = !config.isSet("customModelData") ? config.getInt("customModelData")
                 : 0;
 
         ballCustomModelData = !config.isSet("ballCustomModelData") ? config.getInt("ballCustomModelData")
                 : 0;
-
 
         try {
             TranslationFileReader.init();
@@ -151,13 +197,13 @@ public class ConfigSetting {
             griefPreventionFlag.add("Access");
         }
 
+        // Changed: Load entities as strings and validate them
         for (String entity : config.getStringList("CatchableEntity")) {
-            try {
-                EntityType.valueOf(entity.toUpperCase());// entityType only can receive UpperCase words
-                catchableEntity.add(EntityType.valueOf(entity.toUpperCase()));
-
-                // There is a common issue that you put an unknown entityType in the list of CatchableEntity
-            } catch (IllegalArgumentException e) {
+            String entityName = entity.toUpperCase();
+            if (isValidEntityType(entityName)) {
+                catchableEntity.add(entityName);
+            } else {
+                plugin.getLogger().log(Level.WARNING, ChatColor.YELLOW + "Unknown entity type '" + entity + "' in CatchableEntity list, skipping...");
             }
         }
 
@@ -181,6 +227,9 @@ public class ConfigSetting {
 
         UseSCS = !config.isSet("UseSCS")
                 || config.getBoolean("UseSCS");
+
+        UseTowny = !config.isSet("UseTowny")
+                || config.getBoolean("UseTowny");
 
         /*UseWG = !config.isSet("UseWG")
                 || config.getBoolean("UseWG");
@@ -244,11 +293,9 @@ public class ConfigSetting {
      */
     public static void saveEntityList() {
         FileConfiguration fileConfiguration = plugin.getConfig();
-        List<String> savelist = new ArrayList<>();
 
-        ConfigSetting.catchableEntity.forEach(e -> savelist.add(e.toString()));
-
-        fileConfiguration.set("CatchableEntity", savelist.toArray());
+        // Changed: catchableEntity is already a List<String>, so no need to convert
+        fileConfiguration.set("CatchableEntity", catchableEntity.toArray());
 
         try {
             fileConfiguration.save(new File(plugin.getDataFolder(), "config.yml"));
@@ -276,5 +323,11 @@ public class ConfigSetting {
             if (currentPart > latestPart) return true;
         }
         return currentParts.length >= latestParts.length;
+    }
+
+    public enum DropMethodType {
+        CHICKEN,
+        ENTITY,
+        BLOCK
     }
 }

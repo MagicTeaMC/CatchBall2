@@ -1,12 +1,11 @@
 package com.github.nutt1101;
 
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
+import com.bekvon.bukkit.residence.api.ResidenceApi;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
-import com.github.nutt1101.event.DropGoldEgg;
-import com.github.nutt1101.event.GUIClick;
-import com.github.nutt1101.event.HitEvent;
-import com.github.nutt1101.event.SkullClick;
+import com.github.nutt1101.event.*;
+import org.bstats.bukkit.Metrics;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
@@ -16,6 +15,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.angeschossen.lands.api.LandsIntegration;
+import fr.xyness.SCS.API.SimpleClaimSystemAPI;
+import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
+
 import java.util.logging.Level;
 
 public class CatchBall extends JavaPlugin {
@@ -23,10 +26,29 @@ public class CatchBall extends JavaPlugin {
 
     public static Plugin plugin;
 
-    private void checkPluginHook(String pluginName) {
-        if (this.getServer().getPluginManager().getPlugin(pluginName) != null) {
+    // Plugin availability flags
+    public static boolean hasResidence = false;
+    public static boolean hasMythicMobs = false;
+    public static boolean hasGriefPrevention = false;
+    public static boolean hasLands = false;
+    public static boolean hasPlaceholderAPI = false;
+    public static boolean hasRedProtect = false;
+    public static boolean hasSimpleClaimSystem = false;
+    public static boolean hasTowny = false;
+    public static boolean hasWorldGuard = false;
+
+    // API instances (initialized once at startup)
+    public static LandsIntegration landsAPI;
+    public static SimpleClaimSystemAPI scsAPI;
+
+    private Metrics metrics;
+
+    private boolean checkAndInitializePlugin(String pluginName) {
+        boolean hasPlugin = this.getServer().getPluginManager().getPlugin(pluginName) != null;
+        if (hasPlugin) {
             plugin.getLogger().log(Level.INFO, ChatColor.GREEN + pluginName + " Hook!");
         }
+        return hasPlugin;
     }
 
     @Override
@@ -36,35 +58,80 @@ public class CatchBall extends JavaPlugin {
 
         ConfigSetting.checkConfig();
 
-        new Metrics(this, 12380);
+        Metrics metrics = new Metrics(this, 12380);
+
+        // Initialize plugin availability flags and APIs
+        initializePluginIntegrations();
+
         registerEvent();
         registerCommand();
 
-        new UpdateChecker(this, UpdateCheckSource.HANGAR, "Maoyue_OUO/CatchBall/Release")
+        new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
                 .checkEveryXHours(1) // Check every hour
-                .setDownloadLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
-                .setChangelogLink("https://hangar.papermc.io/Maoyue_OUO/CatchBall/versions")
+                .setDownloadLink("https://modrinth.com/plugin/catchball/version/latest")
+                .setChangelogLink("https://modrinth.com/plugin/catchball/version/latest")
                 .checkNow(); // And check right now
 
-        checkPluginHook("Residence");
-        checkPluginHook("MythicMobs");
-        checkPluginHook("GriefPrevention");
-        checkPluginHook("Lands");
-        checkPluginHook("PlaceholderAPI");
-        checkPluginHook("RedProtect");
-        checkPluginHook("SimpleClaimSystem");
-        // TODO
-        // checkPluginHook("WorldGuard");
-
         HandySchedulerUtil.init(this);
+    }
 
+    private void initializePluginIntegrations() {
+        // Check plugin availability and initialize APIs
+        hasResidence = checkAndInitializePlugin("Residence");
+
+        hasMythicMobs = checkAndInitializePlugin("MythicMobs");
+
+        hasGriefPrevention = checkAndInitializePlugin("GriefPrevention");
+
+        hasLands = checkAndInitializePlugin("Lands");
+        if (hasLands) {
+            try {
+                landsAPI = LandsIntegration.of(plugin);
+            } catch (Exception e) {
+                plugin.getLogger().log(Level.WARNING, "Failed to initialize Lands API: " + e.getMessage());
+                hasLands = false;
+            }
+        }
+
+        hasPlaceholderAPI = checkAndInitializePlugin("PlaceholderAPI");
+
+        hasRedProtect = checkAndInitializePlugin("RedProtect");
+
+        hasSimpleClaimSystem = checkAndInitializePlugin("SimpleClaimSystem");
+        if (hasSimpleClaimSystem) {
+            try {
+                scsAPI = SimpleClaimSystemAPI_Provider.getAPI();
+            } catch (Exception e) {
+                plugin.getLogger().log(Level.WARNING, "Failed to initialize SimpleClaimSystem API: " + e.getMessage());
+                hasSimpleClaimSystem = false;
+            }
+        }
+
+        hasTowny = checkAndInitializePlugin("Towny");
+
+        hasWorldGuard = checkAndInitializePlugin("WorldGuard");
+    }
+
+    @Override
+    public void onDisable() {
+        // Shutdown metrics
+        if (metrics != null) {
+            metrics.shutdown();
+        }
+
+        // Cancel all tasks registered by this plugin
+        getServer().getScheduler().cancelTasks(this);
     }
 
     // register event
     public void registerEvent() {
         PluginManager registerEvent = this.getServer().getPluginManager();
         registerEvent.registerEvents(new HitEvent(), this);
-        registerEvent.registerEvents(new DropGoldEgg(), this);
+        if (ConfigSetting.DropEnable) {
+            registerEvent.registerEvents(new EntityDrop(), this);
+            registerEvent.registerEvents(new BlockDrop(), this);
+            registerEvent.registerEvents(new ChickenDrop(), this);
+        }
         registerEvent.registerEvents(new SkullClick(), this);
         registerEvent.registerEvents(new GUIClick(), this);
     }
@@ -81,5 +148,4 @@ public class CatchBall extends JavaPlugin {
     public static String getServerVersion() {
         return plugin.getServer().getBukkitVersion();
     }
-
 }

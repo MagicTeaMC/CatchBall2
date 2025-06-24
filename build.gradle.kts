@@ -2,13 +2,13 @@ plugins {
     java
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "2.1.20"
-    id("com.gradleup.shadow") version "8.3.5"
+    kotlin("jvm") version "2.1.21"
+    id("com.gradleup.shadow") version "8.3.6"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.github.nutt1101"
-version = "2.0.4"
+version = "2.1.0"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -52,23 +52,28 @@ repositories {
     maven {
         url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
+    maven {
+        url = uri("https://repo.glaremasters.me/repository/towny/")
+    }
 }
 
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
-    api("de.tr7zw:item-nbt-api:2.15.0")
-    api("cn.handyplus.lib.adapter:FoliaLib:1.1.5")
+    api("de.tr7zw:item-nbt-api:2.15.1-20250619.003022-5")
+    api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
+    api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
-    compileOnly("io.lumine:Mythic-Dist:5.8.2")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.13")
+    compileOnly("io.lumine:Mythic-Dist:5.9.0")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
-    compileOnly("com.github.angeschossen:LandsAPI:7.13.1")
-    compileOnly(files("./libs/SimpleClaimSystem-1.11.6.2.jar"))
+    compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
+    compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.14")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
-    compileOnly(files("./libs/Residence5.1.6.4.jar"))
+    compileOnly(files("./libs/Residence5.1.7.5.jar"))
 }
 
 val targetJavaVersion = 21
@@ -103,6 +108,7 @@ tasks {
 
         relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
+        relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 
     }
 }
@@ -112,7 +118,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.4")
+    minecraftVersion("1.21.5")
 }
 
 runPaper.folia.registerTask()
