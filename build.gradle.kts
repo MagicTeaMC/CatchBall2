@@ -2,8 +2,8 @@ plugins {
     java
     `java-library`
     `maven-publish`
-    kotlin("jvm") version "2.1.21"
-    id("com.gradleup.shadow") version "8.3.6"
+    kotlin("jvm") version "2.2.0"
+    id("com.gradleup.shadow") version "8.3.8"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -60,8 +60,8 @@ repositories {
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
-    api("de.tr7zw:item-nbt-api:2.15.1-20250619.003022-5")
-    api("cn.handyplus.lib.adapter:FoliaLib:1.2.0")
+    api("de.tr7zw:item-nbt-api:2.15.1-20250622.113959-6")
+    api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
     api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
