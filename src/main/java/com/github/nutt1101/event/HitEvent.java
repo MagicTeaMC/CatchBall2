@@ -388,7 +388,7 @@ public class HitEvent implements Listener {
 
     public boolean townyCheck(Player player, Location location) {
         if (!CatchBall.hasTowny) { return true; }
-        boolean bBuild = PlayerCacheUtil.getCachePermission(player, location, Material.valueOf("dirt"), TownyPermission.ActionType.BUILD);
+        boolean bBuild = PlayerCacheUtil.getCachePermission(player, location, Material.DIRT, TownyPermission.ActionType.BUILD);
         return bBuild;
     }
 
