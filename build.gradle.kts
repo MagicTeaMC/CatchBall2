@@ -70,7 +70,7 @@ dependencies {
     compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.14")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.101.2.0")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
     compileOnly(files("./libs/Residence5.1.7.5.jar"))
