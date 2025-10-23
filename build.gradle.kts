@@ -8,14 +8,14 @@ plugins {
 }
 
 group = "com.github.nutt1101"
-version = "2.1.1"
+version = "2.1.2"
 description = "CatchBall"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenLocal()
     maven {
-        url = uri("https://repo.destroystokyo.com/repository/maven-public//")
+        url = uri("https://repo.destroystokyo.com/repository/maven-public/")
     }
 
     maven {
@@ -60,7 +60,7 @@ repositories {
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("com.jeff_media:SpigotUpdateChecker:3.0.4")
-    api("de.tr7zw:item-nbt-api:2.15.1")
+    api("de.tr7zw:item-nbt-api:2.15.3-20251004.181015-4")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
     api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
@@ -118,7 +118,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.7")
+    minecraftVersion("1.21.8")
 }
 
 runPaper.folia.registerTask()
