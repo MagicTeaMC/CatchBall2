@@ -4,7 +4,7 @@
 [versions]
 br-net-fabiozumbi12-redprotect-redprotect-core = "7.7.3"
 br-net-fabiozumbi12-redprotect-redprotect-spigot = "7.7.3"
-com-github-angeschossen-landsapi = "7.15.20"
+com-github-angeschossen-landsapi = "7.19.15"
 com-github-techfortress-griefprevention = "17.0.0"
 com-github-xyness-simpleclaimsystem = "1.12.3.2"
 com-jeff-media-spigotupdatechecker = "3.0.4"
