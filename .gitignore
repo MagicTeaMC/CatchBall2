@@ -119,3 +119,7 @@ run/
 
 .project
 .settings/*
+bin
+.classpath
+!gradle-wrapper.jar
+build
