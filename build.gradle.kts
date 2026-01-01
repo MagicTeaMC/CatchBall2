@@ -39,7 +39,7 @@ repositories {
     }
 
     maven {
-        url = uri("https://repo.jeff-media.com/public/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 
     maven {
@@ -59,11 +59,10 @@ repositories {
 
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
-    api("com.jeff_media:SpigotUpdateChecker:3.0.4")
     api("de.tr7zw:item-nbt-api:2.15.5")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
     api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
