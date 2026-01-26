@@ -61,7 +61,7 @@ dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.15.5")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
-    api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
+    api("com.tchristofferson:ConfigUpdater:2.2")
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
