@@ -1,7 +1,6 @@
 package com.github.nutt1101;
 
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
-import com.bekvon.bukkit.residence.api.ResidenceApi;
 import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.*;
