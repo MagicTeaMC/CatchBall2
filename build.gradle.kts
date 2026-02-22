@@ -14,6 +14,7 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
         url = uri("https://repo.destroystokyo.com/repository/maven-public/")
     }

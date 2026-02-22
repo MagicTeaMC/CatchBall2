@@ -5,8 +5,6 @@ import com.github.nutt1101.command.Command;
 import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.*;
 import org.bstats.bukkit.Metrics;
-import com.jeff_media.updatechecker.UpdateCheckSource;
-import com.jeff_media.updatechecker.UpdateChecker;
 import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -65,11 +63,6 @@ public class CatchBall extends JavaPlugin {
         registerEvent();
         registerCommand();
 
-        new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "MagicTeaMC/CatchBall2")
-                .checkEveryXHours(1) // Check every hour
-                .setDownloadLink("https://modrinth.com/plugin/catchball/version/latest")
-                .setChangelogLink("https://modrinth.com/plugin/catchball/version/latest")
-                .checkNow(); // And check right now
 
         HandySchedulerUtil.init(this);
     }
