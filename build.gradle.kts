@@ -3,7 +3,7 @@ plugins {
     `java-library`
     `maven-publish`
     kotlin("jvm") version "2.2.0"
-    id("com.gradleup.shadow") version "8.3.8"
+    id("com.gradleup.shadow") version "9.2.2"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
@@ -14,8 +14,9 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
-        url = uri("https://repo.destroystokyo.com/repository/maven-public//")
+        url = uri("https://repo.destroystokyo.com/repository/maven-public/")
     }
 
     maven {
@@ -39,7 +40,7 @@ repositories {
     }
 
     maven {
-        url = uri("https://repo.jeff-media.com/public/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 
     maven {
@@ -59,18 +60,17 @@ repositories {
 
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
-    api("com.jeff_media:SpigotUpdateChecker:3.0.4")
-    api("de.tr7zw:item-nbt-api:2.15.2-20250717.183515-1")
+    api("de.tr7zw:item-nbt-api:2.15.7")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
     api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-api:1.20.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.github.angeschossen:LandsAPI:7.15.4")
     compileOnly("com.github.Xyness:SimpleClaimSystem:1.12.3.2")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("com.palmergames.bukkit.towny:towny:0.101.1.14")
+    compileOnly("com.palmergames.bukkit.towny:towny:0.101.2.6")
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2"){ exclude(group = "*")} // Core is not needed but allow access to all region methods
     compileOnly ("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2"){ exclude(group = "*")}
     compileOnly(files("./libs/Residence5.1.7.5.jar"))
@@ -118,7 +118,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.8")
+    minecraftVersion("26.1.1")
 }
 
 runPaper.folia.registerTask()

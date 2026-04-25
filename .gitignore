@@ -116,3 +116,10 @@ run/
 */target/*
 
 .gradle
+
+.project
+.settings/*
+bin
+.classpath
+!gradle-wrapper.jar
+build
