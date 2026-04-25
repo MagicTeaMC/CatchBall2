@@ -60,7 +60,7 @@ repositories {
 
 dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
-    api("de.tr7zw:item-nbt-api:2.15.5")
+    api("de.tr7zw:item-nbt-api:2.15.7")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
     api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
@@ -118,7 +118,7 @@ tasks.jar {
 }
 
 tasks.runServer {
-    minecraftVersion("1.21.11")
+    minecraftVersion("26.1.1")
 }
 
 runPaper.folia.registerTask()
