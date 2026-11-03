@@ -23,7 +23,7 @@ public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;
     public static String locale;
     public static boolean updatecheck;
-    public static List<String> catchableEntity = new ArrayList<>(); // Changed from EntityType to String
+    public static volatile List<String> catchableEntity = List.of(); // Changed from EntityType to String
     public static boolean DropEnable;
     public static boolean DropNeedPermission;
     public static DropMethodType DropMethod;
@@ -71,7 +71,7 @@ public class ConfigSetting {
     /**
      * Initialize or reload the plugin
      */
-    public static void checkConfig() {
+    public static synchronized void checkConfig() {
         FileConfiguration config = com.github.nutt1101.configuration.ConfigSchema.load(
                 plugin.getDataFolder().toPath().resolve("config.yml"),
                 plugin.getResource("config.yml"), plugin.getLogger()::warning);
@@ -152,9 +152,7 @@ public class ConfigSetting {
 
         new BallRecipe();
 
-        if (!catchableEntity.isEmpty()) {
-            catchableEntity.clear();
-        }
+        List<String> loadedEntities = new ArrayList<>();
 
         try {
             if (plugin.getServer().getPluginManager().getPlugin("Residence") != null) {
@@ -192,11 +190,13 @@ public class ConfigSetting {
         for (String entity : config.getStringList("capture.catchable-entities")) {
             String entityName = entity.toUpperCase();
             if (isValidEntityType(entityName)) {
-                catchableEntity.add(entityName);
+                loadedEntities.add(entityName);
             } else {
                 plugin.getLogger().log(Level.WARNING, ChatColor.YELLOW + "Unknown entity type '" + entity + "' in CatchableEntity list, skipping...");
             }
         }
+
+        catchableEntity = List.copyOf(loadedEntities);
 
         UseRes = !config.isSet("integrations.residence.enabled")
                 || config.getBoolean("integrations.residence.enabled");
@@ -227,6 +227,9 @@ public class ConfigSetting {
 
                 // TODO
          */
+        if (plugin instanceof CatchBall catchBall && catchBall.getMenus() != null) {
+            catchBall.getMenus().reload();
+        }
     }
 
     /**
@@ -282,18 +285,19 @@ public class ConfigSetting {
     /**
      * Save the entity.yml file if the catchableEntity changes.
      */
-    public static void saveEntityList() {
-        FileConfiguration fileConfiguration = plugin.getConfig();
-
-        // Changed: catchableEntity is already a List<String>, so no need to convert
-        fileConfiguration.set("capture.catchable-entities", new ArrayList<>(new LinkedHashSet<>(catchableEntity)));
-
+    public static synchronized void persistEntityList(Set<String> selection) throws IOException {
+        YamlConfiguration candidate = new YamlConfiguration();
         try {
-            com.github.nutt1101.configuration.ConfigSchema.save(
-                    plugin.getDataFolder().toPath().resolve("config.yml"), fileConfiguration);
-        } catch (IOException e) {
-            e.printStackTrace();
+            candidate.loadFromString(plugin.getConfig().saveToString());
+        } catch (org.bukkit.configuration.InvalidConfigurationException e) {
+            throw new IOException("Could not prepare configuration", e);
         }
+        List<String> values = selection.stream().sorted().toList();
+        candidate.set("capture.catchable-entities", values);
+        com.github.nutt1101.configuration.ConfigSchema.save(
+                plugin.getDataFolder().toPath().resolve("config.yml"), candidate);
+        plugin.getConfig().set("capture.catchable-entities", values);
+        catchableEntity = List.copyOf(values);
     }
 
     public static boolean isLatestVersion(String current, String latest) {

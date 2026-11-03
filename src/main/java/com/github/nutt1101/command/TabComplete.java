@@ -19,12 +19,14 @@ public class TabComplete {
         // tabComplete will be show suggest arument to commandSender
         final List<String> sort = new ArrayList<>();
 
-        if (!sender.hasPermission("catchball.op")) { return List.of(); }
-
         if (args.length == 1) {
-            StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument(), sort);
+            StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument().stream()
+                    .filter(arg -> sender.hasPermission("catchball.op") || sender.hasPermission("catchball.command." + arg)).toList(), sort);
             return sort;
         }
+
+        if (args.length > 0 && !sender.hasPermission("catchball.op")
+                && !sender.hasPermission("catchball.command." + args[0].toLowerCase(java.util.Locale.ROOT))) return List.of();
 
         if (args.length == 2) {
             entityList.clear();

@@ -1,6 +1,5 @@
 package com.github.nutt1101.event;
 
-import cn.handyplus.lib.adapter.PlayerSchedulerUtil;
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.utils.NBTHandler;
@@ -93,7 +92,7 @@ public class SkullClick implements Listener{
                         location.setZ(location.getBlockZ() + 0.5);
 
                         NBTHandler.loadEntityNBT(plugin, entity, data);
-                        PlayerSchedulerUtil.teleport(entity, location);
+                        entity.teleportAsync(location);
 
                         event.getItem().setAmount(0);
                     } catch (Exception e) {

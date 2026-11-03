@@ -15,7 +15,7 @@ public class CommandCheck {
         // Check if player has permission
         if (!(sender.hasPermission("catchball.op"))) {
             // Check if player has specific command permission
-            if (args.length > 0 && !sender.hasPermission("catchball.command." + args[0])) {
+            if (args.length > 0 && !sender.hasPermission("catchball.command." + args[0].toLowerCase(java.util.Locale.ROOT))) {
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermission, "", ""));
                 return false;
             }

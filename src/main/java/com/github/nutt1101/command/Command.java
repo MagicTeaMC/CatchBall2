@@ -1,7 +1,11 @@
 package com.github.nutt1101.command;
 
 import com.github.nutt1101.ConfigSetting;
-import com.github.nutt1101.GUI.CatchableList;
+import com.github.nutt1101.CatchBall;
+import com.github.nutt1101.menu.MenuText;
+import java.io.IOException;
+import java.util.Map;
+import java.util.LinkedHashSet;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.items.DropItem;
 import com.github.nutt1101.utils.TranslationFileReader;
@@ -53,124 +57,11 @@ public class Command implements BasicCommand {
                 return true;
             }
 
-            new CatchableList().openCatchableList((Player) sender, 1);
+            ((CatchBall) CatchBall.plugin).getMenus().open((Player) sender);
 
-        } else if (args[0].equalsIgnoreCase("add")) {
-            if (args.length == 1) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.addEntityDoesNotExist, "", ""));
-                return true;
-            }
-
-            if (args[1].equalsIgnoreCase("all")) {
-                Set<String> entityList = ConfigSetting.entityFile.getConfigurationSection("EntityList")
-                        .getKeys(false);
-                int addedCount = 0;
-                int skippedCount = 0;
-                List<String> skippedEntities = new ArrayList<>();
-
-                for (String entity : entityList) {
-                    EntityType entityType = safeGetEntityType(entity);
-                    if (entityType == null) {
-                        // Entity doesn't exist in this MC version - skip it
-                        skippedCount++;
-                        skippedEntities.add(entity);
-                        continue;
-                    }
-
-                    if (!ConfigSetting.catchableEntity.contains(entityType.name())) {
-                        ConfigSetting.catchableEntity.add(String.valueOf(entityType));
-                        addedCount++;
-                    }
-                }
-
-                // Provide detailed feedback
-                if (addedCount > 0) {
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            TranslationFileReader.allEntityAddSuccess + " §7(" + addedCount + " entities added)"));
-                    ConfigSetting.saveEntityList();
-
-                    // Warn about skipped entities if any
-                    if (skippedCount > 0) {
-                        sender.sendMessage(ChatColor.YELLOW + "Warning: " + skippedCount +
-                                " entities were skipped (not available in this MC version)");
-                    }
-                } else if (skippedCount > 0) {
-                    sender.sendMessage(ChatColor.YELLOW + "No entities were added. " + skippedCount +
-                            " entities in config are not available in this Minecraft version.");
-                } else {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.entityDoesExists, "", ""));
-                }
-                return true;
-            }
-
-            // Check if entity exists in config (case insensitive)
-            String matchedEntity = findMatchingEntity(args[1]);
-            if (matchedEntity == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                return true;
-            }
-
-            // Safely get EntityType
-            EntityType entityType = safeGetEntityType(matchedEntity);
-            if (entityType == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                return true;
-            }
-
-            if (ConfigSetting.catchableEntity.contains(entityType.name())) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.entityDoesExists, "", ""));
-                return true;
-            }
-
-            ConfigSetting.catchableEntity.add(String.valueOf(entityType));
-            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successAddEntity, "", entityType.name()));
-            ConfigSetting.saveEntityList();
+        } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
+            editSelection(sender, args, args[0].equalsIgnoreCase("add"));
             return true;
-
-        } else if (args[0].equalsIgnoreCase("remove")) {
-            if (args.length == 1) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityDoesNotExist, "", ""));
-                return true;
-            }
-
-            if (args[1].equalsIgnoreCase("all")) {
-                int removedCount = ConfigSetting.catchableEntity.size();
-                ConfigSetting.catchableEntity.clear();
-
-                if (removedCount > 0) {
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            TranslationFileReader.allEntityRemoveSuccess + " §7(" + removedCount + " entities removed)"));
-                    ConfigSetting.saveEntityList();
-                } else {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityNotFound, "", ""));
-                }
-                return true;
-            }
-
-            // Check if entity exists in config (case insensitive)
-            String matchedEntity = findMatchingEntity(args[1]);
-            if (matchedEntity == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                return true;
-            }
-
-            // Safely get EntityType
-            EntityType entityType = safeGetEntityType(matchedEntity);
-            if (entityType == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                return true;
-            }
-
-            if (!ConfigSetting.catchableEntity.contains(entityType.name())) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityNotFound, "", ""));
-                return true;
-            }
-
-            ConfigSetting.catchableEntity.remove(entityType.name());
-            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successRemove, "", entityType.name()));
-            ConfigSetting.saveEntityList();
-            return true;
-
         } else if (args[0].equalsIgnoreCase("give")) {
             if (args.length < 3) {
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
@@ -222,6 +113,45 @@ public class Command implements BasicCommand {
         }
 
         return true;
+    }
+
+    private void editSelection(CommandSender sender, String[] args, boolean adding) {
+        if (args.length < 2) {
+            sender.sendMessage(ConfigSetting.toChat(adding ? TranslationFileReader.addEntityDoesNotExist
+                    : TranslationFileReader.removeEntityDoesNotExist, "", ""));
+            return;
+        }
+        Set<String> targets = new LinkedHashSet<>();
+        boolean all = args[1].equalsIgnoreCase("all");
+        if (all) {
+            if (adding) {
+                for (String name : ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false)) {
+                    if (safeGetEntityType(name) != null) targets.add(name);
+                }
+            }
+        } else {
+            String name = findMatchingEntity(args[1]);
+            if (name == null || safeGetEntityType(name) == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
+                return;
+            }
+            targets.add(name);
+        }
+        try {
+            boolean changed = ((CatchBall) CatchBall.plugin).getSelections().update(next -> {
+                if (adding) next.addAll(targets);
+                else if (all) next.clear();
+                else next.removeAll(targets);
+            });
+            String message = !changed ? (adding ? TranslationFileReader.entityDoesExists : TranslationFileReader.removeEntityNotFound)
+                    : all ? (adding ? TranslationFileReader.allEntityAddSuccess : TranslationFileReader.allEntityRemoveSuccess)
+                    : (adding ? TranslationFileReader.successAddEntity : TranslationFileReader.successRemove);
+            sender.sendMessage(ConfigSetting.toChat(message, "", all ? "" : targets.iterator().next()));
+        } catch (IOException error) {
+            sender.sendMessage(MenuText.render(TranslationFileReader.localeYamlConfig.getString("Menu.save-failed",
+                    "<red>Could not save the selection. Please try again."), Map.of()));
+            CatchBall.plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not save entity selection", error);
+        }
     }
 
     /**

@@ -25,6 +25,10 @@ public final class ConfigSchema {
     interface MaterialRules {
         boolean isItem(Material material);
         boolean isBlock(Material material);
+        default boolean isSound(String name) {
+            try { Sound.valueOf(name); return true; }
+            catch (IllegalArgumentException error) { return false; }
+        }
     }
 
     private static final MaterialRules SERVER_MATERIALS = new MaterialRules() {
@@ -187,8 +191,11 @@ public final class ConfigSchema {
         config.set("drops.method", method);
         enumValue(config, "capture.particles.type", Particle.class);
         String sound = String.valueOf(config.get("capture.success-sound"));
-        if (!sound.equalsIgnoreCase("false")) enumValue(config, "capture.success-sound", Sound.class);
-        else config.set("capture.success-sound", "false");
+        if (!sound.equalsIgnoreCase("false")) {
+            sound = sound.toUpperCase(Locale.ROOT);
+            if (!materials.isSound(sound)) throw invalid("capture.success-sound", "unknown Sound name");
+            config.set("capture.success-sound", sound);
+        } else config.set("capture.success-sound", "false");
         // Unknown entity names are deliberately kept for cross-version server configurations.
         config.set("capture.catchable-entities", new ArrayList<>(new LinkedHashSet<>(config.getStringList("capture.catchable-entities")
                 .stream().map(s -> s.toUpperCase(Locale.ROOT)).toList())));

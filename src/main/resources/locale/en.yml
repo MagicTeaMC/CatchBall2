@@ -73,3 +73,31 @@ DropSkullLore:
   - "&eCapture Location: &a{LOCATION}"
 
 ReloadFailed: "&cConfiguration reload failed: {REASON}"
+
+# Sparrow UI menus use MiniMessage. Dynamic values are inserted as literal text.
+Menu:
+  title: "<gold>Catchable entities"
+  search: "<yellow>Search entities"
+  search-hint: "<gray>Type a name above, then go back."
+  back: "<yellow>Back"
+  clear: "<yellow>Clear search"
+  filter: "<yellow>Filter: <filter>"
+  page: "<aqua>Page <page>/<pages>"
+  results: "<gray><count> entities · <query>"
+  edit-hint: "<yellow>Click an entity to change its status."
+  view-hint: "<gray>Viewing only."
+  entity-name: "<white><entity>"
+  allowed: "<green>Allowed"
+  blocked: "<red>Blocked"
+  save-failed: "<red>Could not save the selection. Please try again."
+  allow-all: "<green>Allow all listed entities"
+  block-all: "<red>Block all listed entities"
+  confirm-title: "<gold>Confirm selection change"
+  confirm-allow: "<yellow>Allow <count> listed entities?"
+  confirm-block: "<yellow>Block <count> listed entities?"
+  confirm: "<green>Confirm"
+  cancel: "<red>Cancel"
+  filters:
+    all: "All"
+    allowed: "Allowed"
+    blocked: "Blocked"

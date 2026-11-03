@@ -22,6 +22,7 @@ class ConfigSchemaTest {
         public boolean isItem(Material material) {
             return java.util.Set.of(Material.EGG, Material.DIAMOND, Material.DIAMOND_ORE).contains(material);
         }
+        public boolean isSound(String name) { return name.equals("ENTITY_ARROW_HIT_PLAYER"); }
         public boolean isBlock(Material material) { return material == Material.DIAMOND_ORE; }
     };
 

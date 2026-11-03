@@ -15,6 +15,12 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 repositories {
     mavenLocal()
     mavenCentral()
+    exclusiveContent {
+        forRepository { maven { url = uri("https://repo.papermc.io/repository/maven-public/") } }
+        filter { includeGroup("io.papermc.paper") }
+    }
+    maven("https://libraries.minecraft.net") { content { includeGroup("com.mojang") } }
+    maven("https://repo.momirealms.net/snapshots")
     maven {
         url = uri("https://repo.destroystokyo.com/repository/maven-public/")
     }
@@ -59,13 +65,14 @@ repositories {
 }
 
 dependencies {
+    implementation("net.momirealms:sparrow-ui:beta.38")
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
-    api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
+    implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
-    testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
@@ -106,7 +113,14 @@ tasks {
 
         configurations = listOf(project.configurations.runtimeClasspath.get())
 
-        minimize()
+        minimize {
+            // Sparrow loads proxy classes and resources reflectively.
+            exclude(dependency("net.momirealms:sparrow-ui:.*"))
+            exclude(dependency("com.github.Anon8281:UniversalScheduler:.*"))
+        }
+
+        relocate("com.github.Anon8281.universalScheduler", "tw.maoyue.catchball.libs.scheduler")
+        relocate("net.momirealms.sparrow.ui", "tw.maoyue.catchball.libs.sparrow.ui")
 
         relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")

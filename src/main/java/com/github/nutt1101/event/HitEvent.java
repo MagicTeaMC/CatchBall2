@@ -34,7 +34,6 @@ import java.util.Objects;
 
 
 public class HitEvent implements Listener {
-    private List<String> catchableEntity = ConfigSetting.catchableEntity; // Changed from EntityType to String
     private Location hitLocation;
     private final Plugin plugin = CatchBall.plugin;
     private final String[] mmPackage = {"io.lumine.mythic.bukkit.BukkitAPIHelper", "io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper"};
@@ -44,7 +43,7 @@ public class HitEvent implements Listener {
      */
     private boolean isEntityCatchable(EntityType entityType) {
         String entityName = entityType.name();
-        return catchableEntity.contains(entityName);
+        return ConfigSetting.catchableEntity.contains(entityName);
     }
 
     @EventHandler

@@ -58,3 +58,31 @@ DropSkullLore:
   - "&e捕获地点： &a{LOCATION}"
 
 ReloadFailed: "&c配置重新加载失败：{REASON}"
+
+# Sparrow UI menus use MiniMessage. Dynamic values are inserted as literal text.
+Menu:
+  title: "<gold>可捕捉实体"
+  search: "<yellow>搜索实体"
+  search-hint: "<gray>在上方输入名称，再按返回。"
+  back: "<yellow>返回"
+  clear: "<yellow>清除搜索"
+  filter: "<yellow>筛选：<filter>"
+  page: "<aqua>第 <page>/<pages> 页"
+  results: "<gray><count> 个实体 · <query>"
+  edit-hint: "<yellow>点击实体切换可捕捉状态。"
+  view-hint: "<gray>当前为浏览模式。"
+  entity-name: "<white><entity>"
+  allowed: "<green>允许捕捉"
+  blocked: "<red>禁止捕捉"
+  save-failed: "<red>无法保存更改，请重试。"
+  allow-all: "<green>允许全部列出的实体"
+  block-all: "<red>禁止全部列出的实体"
+  confirm-title: "<gold>确认修改列表"
+  confirm-allow: "<yellow>允许捕捉列出的 <count> 个实体？"
+  confirm-block: "<yellow>禁止捕捉列出的 <count> 个实体？"
+  confirm: "<green>确认"
+  cancel: "<red>取消"
+  filters:
+    all: "全部"
+    allowed: "允许捕捉"
+    blocked: "禁止捕捉"

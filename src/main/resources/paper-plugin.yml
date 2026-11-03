@@ -3,9 +3,15 @@ main: com.github.nutt1101.CatchBall
 authors: [NUTT1101, MagicTeaMC]
 description: "§bA plugin that make entity to be catchable.\n§dMatrix support: https://matrix.to/#/#maoyue-dev:matrix.org"
 version: ${version}
-api-version: '1.21.1'
+api-version: '1.21.4'
 permissions:
   catchball.op:
+    default: op
+  catchball.command.list:
+    description: Browse the catchable entity list
+    default: true
+  catchball.gui.edit:
+    description: Edit the catchable entity list through the menu
     default: op
   catchball.use:
     default: true
