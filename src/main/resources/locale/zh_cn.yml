@@ -7,38 +7,38 @@ PlayerInventoryFull: "<green>您的物品栏已满，因此物品会掉落在您
 ArgDoesNotExist: "<green>命令用法：\n <aqua>/ctb 重新加载 <gray>重新加载插件。\n <aqua>/ctb list <gray>列出所有可捕获的实体和状态。\n <aqua>/ctb 添加 [全部 | (entity_name)] <gray>将实体添加到捕获列表中。\n <aqua>/ctb 删除 [全部 | (entity_name)] <gray>从可捕获列表中删除实体。\n <aqua>/ctb 给予 [player] [DropItem | CatchBall] [Amount] <gray>给予玩家特殊的插件物品"
 ArgTooMuch: "<red>参数过多！"
 UnknownCommandArgument: "<red>未知参数！"
-SuccessGetBall: "<green>成功获取 {ITEM}！"
+SuccessGetBall: "<green>成功获取 <item>！"
 ReloadSuccess: "<green>插件已成功重新加载！"
-CanNotCatchable: "<red>此实体无法被捕获，因此 <yellow>{BALL} <gray>将掉落在 <yellow>{LOCATION}。"
-BallHitBlock: "<red>你并未击中实体，因此 {BALL} 将掉落在 {LOCATION}！"
-NoPermissionToUse: "<red>您没有使用 {BALL} 的权限，因此 {BALL} <red>将掉落在 <yellow>{LOCATION} 中。"
-CatchSuccess: "<green>成功捕获{ENTITY} 位置：{LOCATION}！"
+CanNotCatchable: "<red>此实体无法被捕获，因此 <yellow><ball> <gray>将掉落在 <yellow><location>。"
+BallHitBlock: "<red>你并未击中实体，因此 <ball> 将掉落在 <location>！"
+NoPermissionToUse: "<red>您没有使用 <ball> 的权限，因此 <ball> <red>将掉落在 <yellow><location> 中。"
+CatchSuccess: "<green>成功捕获<entity> 位置：<location>！"
 ItemDoesNotExist: "<red>请输入要拾取的物品 <gray>CatchBall | DropItem."
 ItemNameError: "<red>请输入正确的物品名称 <gray>CatchBall | DropItem。"
 AddEntityDoesNotExist: "<red>请输入要添加到捕获生物列表中的实体名称！"
 UnknownEntityType: "<red>未知实体类型！"
 EntityDoesExists: "<red>该实体已存在于可捕获列表中！"
-SuccessAddEntity: "<aqua>{ENTITY} <green>已成功添加至可捕获列表！"
+SuccessAddEntity: "<aqua><entity> <green>已成功添加至可捕获列表！"
 RemoveEntityDoesNotExist: "<red>请输入要从可捕获列表中删除的实体名称！"
 RemoveEntityNotFound: "<red>在可捕获列表中找不到实体！"
-SuccessRemove: "<green>成功从可捕获列表中删除 <aqua>{ENTITY}！"
+SuccessRemove: "<green>成功从可捕获列表中删除 <aqua><entity>！"
 SkullDoesNotFound: "头颅存放的实体数据已遗失！"
 LocationUnsafe: "<red>无法找到一个安全区域来生成。因此，此请求已被取消！"
-NoResidencePermissions: "<red>您无法在此生成实体，因为您缺乏此领地的 {FLAG} 权限！"
+NoResidencePermissions: "<red>您无法在此生成实体，因为您缺乏此领地的 <flag> 权限！"
 AllEntityAddSuccess: "<green>已将所有生物新增至可捕获列表内！"
 AllEntityRemoveSuccess: "<yellow>已将可捕获生物列表清空！"
 PlayerNotExist: "<red>请输入要给予物品的玩家！"
-UnknownOrOfflinePlayer: "<red>未找到此玩家 {PLAYER}！"
-SuccessGiveItemToPlayer: "<green>成功给予玩家 {PLAYER} {ITEM}"
+UnknownOrOfflinePlayer: "<red>未找到此玩家 <player>！"
+SuccessGiveItemToPlayer: "<green>成功给予玩家 <player> <item>"
 invalidItemAmount: "<red>未知的物品数量！"
 #/ctb list GUI
 catchableListTitle: "<bold>捕获列表设置"
 prevPage: "<green>上一页"
 nextPage: "<green>下一页"
-currentPage: "<yellow>当前页面： <green>{PAGE}"
+currentPage: "<yellow>当前页面： <green><page>"
 guiSkullLore:
-  - "<gold>自定义实体显示名称 {ENTITY}"
-  - "<gold>捕获状态：{CATCHABLE}"
+  - "<gold>自定义实体显示名称 <entity>"
+  - "<gold>捕获状态：<catchable>"
 #The plugin special item setting
 Items:
   CatchBall:
@@ -48,16 +48,16 @@ Items:
   DropItem:
     DisplayName: "<gold>金蛋"
     Lore:
-      - "<gray>破坏方块,杀生物,鸡生蛋时会有 <yellow>{PERCENT}% <gray> 概率掉落"
+      - "<gray>破坏方块,杀生物,鸡生蛋时会有 <yellow><percent>% <gray> 概率掉落"
       - "<gray>可用于合成捕获球"
 #The lore of the Catch List GUI
 DropSkullLore:
-  - "<yellow>生物种类：<green>{ENTITY}"
-  - "<yellow>捕获者：<green>{PLAYER}"
-  - "<yellow>捕获时间：<green>{TIME}"
-  - "<yellow>捕获地点： <green>{LOCATION}"
+  - "<yellow>生物种类：<green><entity>"
+  - "<yellow>捕获者：<green><player>"
+  - "<yellow>捕获时间：<green><time>"
+  - "<yellow>捕获地点： <green><location>"
 
-ReloadFailed: "<red>配置重新加载失败：{REASON}"
+ReloadFailed: "<red>配置重新加载失败：<reason>"
 
 # Sparrow UI menus use MiniMessage. Dynamic values are inserted as literal text.
 Menu:

@@ -62,6 +62,7 @@ class ConfigSchemaTest {
         assertFalse(result.contains("Locale"));
         assertEquals("keep-me", result.getString("custom-extension"));
         assertEquals(2, result.getInt("config-version"));
+        assertTrue(result.dump().contains("Entity names available on the running server"));
     }
 
     @Test void newPathsWinAndMigrationIsIdempotent() throws Exception {

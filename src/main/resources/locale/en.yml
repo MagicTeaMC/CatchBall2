@@ -1,6 +1,7 @@
 # Help us to translate to other languages at Crowdin!
 # https://crowdin.com/project/catchball
 
+# MiniMessage formatting and <placeholders> are supported; legacy & codes still work.
 # If you installed PlaceholderAPI, you can use Placeholder in messages.
 # But Placeholder about player may cause some issues.
 
@@ -17,29 +18,29 @@ ArgDoesNotExist: "<green>Commands Usage:
 
 ArgTooMuch: "<red>Too many Argument!"
 UnknownCommandArgument: "<red>Unknown Argument!"
-SuccessGetBall: "<green>Successfully get {ITEM}!"
+SuccessGetBall: "<green>Successfully get <item>!"
 ReloadSuccess: "<green>The plugin reloaded successfully!"
-CanNotCatchable: "<red>This entity cannot be captured, so <yellow>{BALL} <gray>fell in <yellow>{LOCATION}."
-BallHitBlock: "<red>You did not hit a entity,So {BALL} fell in {LOCATION}!"
-NoPermissionToUse: "<red>You don't have permission to use {BALL}, so {BALL} <red>fell in <yellow>{LOCATION}."
-CatchSuccess: "<green>Successfully captured {ENTITY} location: {LOCATION}!"
+CanNotCatchable: "<red>This entity cannot be captured, so <yellow><ball> <gray>fell in <yellow><location>."
+BallHitBlock: "<red>You did not hit a entity,So <ball> fell in <location>!"
+NoPermissionToUse: "<red>You don't have permission to use <ball>, so <ball> <red>fell in <yellow><location>."
+CatchSuccess: "<green>Successfully captured <entity> location: <location>!"
 ItemDoesNotExist: "<red>Please enter the item to be picked up  <gray>CatchBall | DropItem."
 ItemNameError: "<red>Please enter the correct item name  <gray>CatchBall | DropItem!"
 AddEntityDoesNotExist: "<red>Please enter the name of the entity to be added to the list of captured creatures!"
 UnknownEntityType: "<red>Unknown entity type!"
 EntityDoesExists: "<red>The entity already exists in the catchable list!"
-SuccessAddEntity: "<aqua>{ENTITY} <green>Successfully added to the catchable list!"
+SuccessAddEntity: "<aqua><entity> <green>Successfully added to the catchable list!"
 RemoveEntityDoesNotExist: "<red>Please enter the name of the entity to be removed from the catchable list!"
 RemoveEntityNotFound: "<red>No entity found in the catchable list!"
-SuccessRemove: "<green>Successfully removed from the catchable list <aqua>{ENTITY}!"
+SuccessRemove: "<green>Successfully removed from the catchable list <aqua><entity>!"
 SkullDoesNotFound: "<red>The data stored in the skull is missing!"
 LocationUnsafe: "<red>Could not find a safe area to spawn, so this request has been cancelled!"
-NoResidencePermissions: "<red>You can’t spawn entity here because you are lacking {FLAG} permission for this residense!"
+NoResidencePermissions: "<red>You can’t spawn entity here because you are lacking <flag> permission for this residense!"
 AllEntityAddSuccess: "<green>All Entity added success!"
 AllEntityRemoveSuccess: "<yellow>All Entity removed success!"
 PlayerNotExist: "<red>Please enter a player that want to give the item!"
-UnknownOrOfflinePlayer: "<red>Player {PLAYER} not find!"
-SuccessGiveItemToPlayer: "<green>Success give {ITEM} to <green>{PLAYER}!"
+UnknownOrOfflinePlayer: "<red>Player <player> not find!"
+SuccessGiveItemToPlayer: "<green>Success give <item> to <green><player>!"
 invalidItemAmount: "<red>Invalid item amount!"
 catchFail: "Oops! Your attempt to catch the creature failed. Try again!"
 
@@ -47,10 +48,10 @@ catchFail: "Oops! Your attempt to catch the creature failed. Try again!"
 catchableListTitle: "<bold>Catch List Settings"
 prevPage: "<green>Previous Page"
 nextPage: "<green>Next Page"
-currentPage: "<yellow>Current Page: <green>{PAGE}"
+currentPage: "<yellow>Current Page: <green><page>"
 guiSkullLore:
-  - "<gold>Custom Name: {ENTITY}"
-  - "<gold>Allow Catch: {CATCHABLE}"
+  - "<gold>Custom Name: <entity>"
+  - "<gold>Allow Catch: <catchable>"
 
 #The plugin special item setting
 Items:
@@ -62,17 +63,17 @@ Items:
   DropItem:
     DisplayName: "<gold>GoldEgg"
     Lore:
-      - "<gray>When destroying blocks, killing creatures, or laying eggs, there is a <yellow>{PERCENT}%<gray> chance of dropping"
+      - "<gray>When destroying blocks, killing creatures, or laying eggs, there is a <yellow><percent>%<gray> chance of dropping"
       - "<gray>Can be used with CraftRecipe to make CatchBall"
 
 #The lore of the Catch List GUI
 DropSkullLore:
-  - "<yellow>ENTITY TYPE: <green>{ENTITY}"
-  - "<yellow>The Catcher: <green>{PLAYER}"
-  - "<yellow>Capture Time: <green>{TIME}"
-  - "<yellow>Capture Location: <green>{LOCATION}"
+  - "<yellow>ENTITY TYPE: <green><entity>"
+  - "<yellow>The Catcher: <green><player>"
+  - "<yellow>Capture Time: <green><time>"
+  - "<yellow>Capture Location: <green><location>"
 
-ReloadFailed: "<red>Configuration reload failed: {REASON}"
+ReloadFailed: "<red>Configuration reload failed: <reason>"
 
 # Sparrow UI menus use MiniMessage. Dynamic values are inserted as literal text.
 Menu:

@@ -127,6 +127,7 @@ public class CatchBall extends JavaPlugin {
     @Override
     public void onDisable() {
         if (menus != null) menus.close();
+        if (commands != null) commands.unregisterAllCommands();
         // Shutdown metrics
         if (metrics != null) {
             metrics.shutdown();

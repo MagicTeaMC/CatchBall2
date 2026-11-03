@@ -17,39 +17,39 @@ ArgDoesNotExist: "<green>指令使用方法:
 
 ArgTooMuch: "<red>輸入的指令參數過多。"
 UnknownCommandArgument: "<red>未知的指令參數。"
-SuccessGetBall: "<green>成功提取 {ITEM}。"
+SuccessGetBall: "<green>成功提取 <item>。"
 ReloadSuccess: "<green>插件設定重新讀取完畢。"
-CanNotCatchable: "<red>此生物無法捕捉！ 捕捉球已掉落於 <yellow>{LOCATION}<red>。"
-BallHitBlock: "<red>您丟到地板或實體方塊上了！ 捕捉球已掉落於 <yellow>{LOCATION}<red>。"
-NoPermissionToUse: "<red>您沒有權限使用 {BALL}，所以 {BALL} <red>掉落在 <yellow>{LOCATION}。"
-CatchSuccess: "<green>成功捕捉 {ENTITY}。"
+CanNotCatchable: "<red>此生物無法捕捉！ 捕捉球已掉落於 <yellow><location><red>。"
+BallHitBlock: "<red>您丟到地板或實體方塊上了！ 捕捉球已掉落於 <yellow><location><red>。"
+NoPermissionToUse: "<red>您沒有權限使用 <ball>，所以 <ball> <red>掉落在 <yellow><location>。"
+CatchSuccess: "<green>成功捕捉 <entity>。"
 ItemDoesNotExist: "<red>請輸入要提取的物品 CatchBall | DropItem。"
 ItemNameError: "<red>請輸入正確的物品名稱 CatchBall | DropItem。"
 AddEntityDoesNotExist: "<red>請輸入要新增至捕捉生物清單的實體名稱。"
 UnknownEntityType: "<red>未知的實體名稱。"
 EntityDoesExists: "<red>實體已存在列表裡面。"
-SuccessAddEntity: "<green>成功將 {ENTITY} 新增至捕捉清單。"
+SuccessAddEntity: "<green>成功將 <entity> 新增至捕捉清單。"
 RemoveEntityDoesNotExist: "<red>請輸入要從捕捉列表移除的生物名稱。"
 RemoveEntityNotFound: "<red>未在捕捉列表內找到實體。"
-SuccessRemove: "<green>成功從捕捉列表移除 {ENTITY}。"
+SuccessRemove: "<green>成功從捕捉列表移除 <entity>。"
 SkullDoesNotFound: "<red>頭顱存放的實體數據遺失。"
 LocationUnsafe: "<red>未能找到一個安全的區域生成，故此次重生已取消。"
-NoResidencePermissions: "<red>您無法在此生成或捕捉動物，因為您缺少了此領地的 {FLAG} 權限。"
+NoResidencePermissions: "<red>您無法在此生成或捕捉動物，因為您缺少了此領地的 <flag> 權限。"
 AllEntityAddSuccess: "<green>已將所有生物新增至可捕捉清單內!"
 AllEntityRemoveSuccess: "<yellow>已將可捕捉生物清單清空!"
 PlayerNotExist: "<red>請輸入欲給物品的玩家!"
-UnknownOrOfflinePlayer: "<red>未找到玩家 {PLAYER}!"
-SuccessGiveItemToPlayer: "<green>成功給予玩家 {PLAYER} {ITEM}!"
+UnknownOrOfflinePlayer: "<red>未找到玩家 <player>!"
+SuccessGiveItemToPlayer: "<green>成功給予玩家 <player> <item>!"
 catchFail: "哎呀！你捕捉生物失敗了。再試一次吧！"
 
 # /ctb list 介面
 catchableListTitle: "<bold>捕捉清單設置"
 prevPage: "<green>上一頁"
 nextPage: "<green>下一頁"
-currentPage: "<yellow>目前頁面： <green>{PAGE}"
+currentPage: "<yellow>目前頁面： <green><page>"
 guiSkullLore:
-  - "<gold>顯示名稱: {ENTITY}"
-  - "<gold>捕捉狀態: {CATCHABLE}"
+  - "<gold>顯示名稱: <entity>"
+  - "<gold>捕捉狀態: <catchable>"
 
 # 插件特殊物品設定
 Items:
@@ -65,17 +65,17 @@ Items:
   DropItem:
     DisplayName: "<gold>金雞蛋"
     Lore:
-      - "<gray>破壞方塊,殺生物,雞生蛋時會有 <yellow>{PERCENT}% <gray>機率掉落"
+      - "<gray>破壞方塊,殺生物,雞生蛋時會有 <yellow><percent>% <gray>機率掉落"
       - "<gray>可用於合成捕捉球"
 
 # 捕捉掉落頭顱敘述
 DropSkullLore:
-  - "<yellow>生物種類: <green>{ENTITY}"
-  - "<yellow>抓捕者: <green>{PLAYER}"
-  - "<yellow>抓捕時間: <green>{TIME}"
-  - "<yellow>抓捕地點: <green>{LOCATION}"
+  - "<yellow>生物種類: <green><entity>"
+  - "<yellow>抓捕者: <green><player>"
+  - "<yellow>抓捕時間: <green><time>"
+  - "<yellow>抓捕地點: <green><location>"
 
-ReloadFailed: "<red>設定重新載入失敗：{REASON}"
+ReloadFailed: "<red>設定重新載入失敗：<reason>"
 
 # Sparrow UI menus use MiniMessage. Dynamic values are inserted as literal text.
 Menu:

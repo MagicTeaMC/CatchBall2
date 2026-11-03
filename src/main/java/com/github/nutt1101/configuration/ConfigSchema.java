@@ -149,8 +149,19 @@ public final class ConfigSchema {
                     }
                 }
             } else {
-                // Copy the block rather than just its value so inline comments survive.
+                // Keep administrator comments, filling absent notes from the bundled documentation.
+                Block<?> bundledBlock = result.getBlock(path);
                 result.set(path, sourceBlock);
+                if (bundledBlock != null) {
+                    for (NodeRole role : NodeRole.values()) {
+                        for (Comments.Position position : Comments.Position.values()) {
+                            var custom = Comments.get(sourceBlock, role, position);
+                            var fallback = Comments.get(bundledBlock, role, position);
+                            if ((custom == null || custom.isEmpty()) && fallback != null && !fallback.isEmpty())
+                                Comments.set(sourceBlock, role, position, fallback);
+                        }
+                    }
+                }
             }
         }
         Object chance = result.get("drops.chance");
