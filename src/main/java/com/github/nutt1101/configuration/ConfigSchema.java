@@ -1,6 +1,7 @@
 package com.github.nutt1101.configuration;
 
 import org.bukkit.Material;
+import com.github.nutt1101.utils.GameTypes;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -28,6 +29,11 @@ public final class ConfigSchema {
     interface MaterialRules {
         boolean isItem(Material material);
         boolean isBlock(Material material);
+        default Material material(String name) { return Material.matchMaterial(name); }
+        default boolean isParticle(String name) {
+            try { Particle.valueOf(name); return true; }
+            catch (IllegalArgumentException error) { return false; }
+        }
         default boolean isSound(String name) {
             try { Sound.valueOf(name); return true; }
             catch (IllegalArgumentException error) { return false; }
@@ -35,6 +41,12 @@ public final class ConfigSchema {
     }
 
     private static final MaterialRules SERVER_MATERIALS = new MaterialRules() {
+        public Material material(String name) { return GameTypes.material(name); }
+        public boolean isSound(String name) { return GameTypes.sound(name) != null; }
+        public boolean isParticle(String name) {
+            Particle particle = GameTypes.particle(name);
+            return particle != null && particle.getDataType() == Void.class;
+        }
         public boolean isItem(Material material) { return !material.isAir() && material.isItem(); }
         public boolean isBlock(Material material) { return !material.isAir() && material.isBlock(); }
     };
@@ -190,7 +202,9 @@ public final class ConfigSchema {
         String method = config.getString("drops.method").toUpperCase(Locale.ROOT);
         if (!Set.of("CHICKEN", "ENTITY", "BLOCK").contains(method)) throw invalid("drops.method", "must be CHICKEN, ENTITY or BLOCK");
         config.set("drops.method", method);
-        enumValue(config, "capture.particles.type", Particle.class);
+        String particle = config.getString("capture.particles.type").toUpperCase(Locale.ROOT);
+        if (!materials.isParticle(particle)) throw invalid("capture.particles.type", "must name an available particle that needs no extra data");
+        config.set("capture.particles.type", particle);
         String sound = String.valueOf(config.get("capture.success-sound"));
         if (!sound.equalsIgnoreCase("false")) {
             sound = sound.toUpperCase(Locale.ROOT);
@@ -222,7 +236,7 @@ public final class ConfigSchema {
     }
 
     private static Material material(String name, String path, boolean item, MaterialRules materials) {
-        Material material = Material.matchMaterial(name);
+        Material material = materials.material(name);
         if (material == null || (item && !materials.isItem(material))) throw invalid(path, "must name a valid " + (item ? "item" : "material"));
         return material;
     }

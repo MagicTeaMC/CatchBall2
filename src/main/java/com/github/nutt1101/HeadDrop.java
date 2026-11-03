@@ -86,37 +86,24 @@ public class HeadDrop {
      * @return head with texture value
      */
     public ItemStack skullTextures(ItemStack head, YamlConfiguration entityFile, String entityType) {
-        SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
-
+        String texture = entityFile.getString("EntityList." + entityType.toUpperCase(java.util.Locale.ROOT) + ".Skull");
+        if (texture == null || texture.isBlank()) return head;
         try {
+            // Paper's public profile API works across our supported versions. XSkull 14's
+            // reflection fails on Paper 1.21.4, so do not route textures through NMS.
+            String json = new String(Base64.getDecoder().decode(texture), java.nio.charset.StandardCharsets.UTF_8);
+            String url = com.google.gson.JsonParser.parseString(json).getAsJsonObject()
+                    .getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString();
             PlayerProfile profile = Bukkit.createPlayerProfile("catchball");
             PlayerTextures textures = profile.getTextures();
-
-            String textureValue = entityFile.getString("EntityList." + entityType.toUpperCase() + ".Skull");
-
-            if (textureValue != null && !textureValue.isEmpty()) {
-                try {
-                    String decodedValue = new String(Base64.getDecoder().decode(textureValue));
-
-                    String urlStr = decodedValue.split("\"url\":\"")[1].split("\"")[0];
-                    URL textureUrl = new URL(urlStr);
-
-                    textures.setSkin(textureUrl);
-                    profile.setTextures(textures);
-
-                    skullMeta.setOwnerProfile(profile);
-                } catch (Exception e) {
-                    plugin.getLogger().log(Level.WARNING, "Failed to decode texture value: " + e.getMessage());
-                }
-            } else {
-                plugin.getLogger().log(Level.WARNING, "Could not find texture value for entity type: " + entityType);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "Failed to set skull texture: " + e.getMessage());
-            e.printStackTrace();
+            textures.setSkin(java.net.URI.create(url).toURL());
+            profile.setTextures(textures);
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
+            meta.setOwnerProfile(profile);
+            head.setItemMeta(meta);
+        } catch (java.io.IOException | RuntimeException error) {
+            plugin.getLogger().log(Level.WARNING, "Could not apply texture for " + entityType, error);
         }
-
-        head.setItemMeta(skullMeta);
         return head;
     }
 }

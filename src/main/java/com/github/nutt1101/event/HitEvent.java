@@ -7,6 +7,7 @@ import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
+import com.github.nutt1101.utils.GameTypes;
 import com.github.nutt1101.HeadDrop;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.utils.NBTHandler;
@@ -239,7 +240,7 @@ public class HitEvent implements Listener {
 
             // Success sound
             if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
-                player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
+                player.playSound(player.getLocation(), GameTypes.sound(ConfigSetting.catchSuccessSound), 1f, 1f);
             }
 
             // Remove the entity and drop the head
@@ -248,7 +249,7 @@ public class HitEvent implements Listener {
 
             // Show particles
             if (ConfigSetting.ShowParticles) {
-                hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
+                hitEntity.getWorld().spawnParticle(GameTypes.particle(ConfigSetting.CustomParticles), hitLocation, 1);
             }
 
             player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), hitEntity.getType().name()));

@@ -3,6 +3,7 @@ package com.github.nutt1101;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.github.nutt1101.Recipe.BallRecipe;
 import com.github.nutt1101.utils.TranslationFileReader;
+import com.github.nutt1101.utils.GameTypes;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -89,7 +90,7 @@ public class ConfigSetting {
                 ? config.getInt("drops.chance")
                 : 50;
         try {
-            DropItemMaterial = config.contains("drops.material") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.material"))) : Material.EGG;
+            DropItemMaterial = config.contains("drops.material") ? GameTypes.material(Objects.requireNonNull(config.getString("drops.material"))) : Material.EGG;
         } catch (IllegalArgumentException e) {
             plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
             DropItemMaterial = Material.EGG;
@@ -109,7 +110,7 @@ public class ConfigSetting {
             DropEntityType = "CHICKEN";
         }
 
-        DropBlockType = config.contains("drops.block-type") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.block-type"))) : Material.DIAMOND_ORE;
+        DropBlockType = config.contains("drops.block-type") ? GameTypes.material(Objects.requireNonNull(config.getString("drops.block-type"))) : Material.DIAMOND_ORE;
 
         updatecheck = !config.contains("Update-Check") || config.getBoolean("Update-Check");
 

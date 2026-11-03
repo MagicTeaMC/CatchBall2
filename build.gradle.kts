@@ -69,6 +69,7 @@ dependencies {
     implementation("io.github.revxrsal:lamp.common:4.0.0-rc.18")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.18")
     implementation("dev.dejvokep:boosted-yaml:1.3.7")
+    implementation("com.github.cryptomorin:XSeries:14.0.0")
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
     implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
@@ -121,6 +122,7 @@ tasks {
             // Sparrow loads proxy classes and resources reflectively.
             exclude(dependency("net.momirealms:sparrow-ui:.*"))
             exclude(dependency("io.github.revxrsal:.*:.*"))
+            exclude(dependency("com.github.cryptomorin:XSeries:.*"))
             exclude(dependency("com.github.Anon8281:UniversalScheduler:.*"))
         }
 
@@ -129,6 +131,7 @@ tasks {
 
         relocate("revxrsal.commands", "tw.maoyue.catchball.libs.lamp")
         relocate("dev.dejvokep.boostedyaml", "tw.maoyue.catchball.libs.boostedyaml")
+        relocate("com.cryptomorin.xseries", "tw.maoyue.catchball.libs.xseries")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
         relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 

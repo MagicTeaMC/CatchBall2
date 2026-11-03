@@ -5,7 +5,7 @@ import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.items.DropItem;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import com.github.nutt1101.utils.GameTypes;
 import org.bukkit.NamespacedKey;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
@@ -30,11 +30,11 @@ public class BallRecipe {
                 if (name.equalsIgnoreCase("DROPITEM")) {
                     recipe.setIngredient(symbol.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
                 } else {
-                    recipe.setIngredient(symbol.charAt(0), Material.matchMaterial(name));
+                    recipe.setIngredient(symbol.charAt(0), GameTypes.material(name));
                 }
             } else {
                 recipe.setIngredient(symbol.charAt(0), new RecipeChoice.MaterialChoice(
-                        ingredients.getStringList(symbol).stream().map(Material::matchMaterial).toList()));
+                        ingredients.getStringList(symbol).stream().map(GameTypes::material).toList()));
             }
         }
         Bukkit.removeRecipe(key);
