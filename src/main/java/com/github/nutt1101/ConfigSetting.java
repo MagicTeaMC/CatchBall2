@@ -6,7 +6,7 @@ import com.github.nutt1101.utils.TranslationFileReader;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import dev.dejvokep.boostedyaml.YamlDocument;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 public class ConfigSetting {
     private final static Plugin plugin = CatchBall.plugin;
+    private static YamlDocument document;
+    public static YamlDocument configuration() { return document; }
     public static String locale;
     public static boolean updatecheck;
     public static volatile List<String> catchableEntity = List.of(); // Changed from EntityType to String
@@ -72,63 +74,62 @@ public class ConfigSetting {
      * Initialize or reload the plugin
      */
     public static synchronized void checkConfig() {
-        FileConfiguration config = com.github.nutt1101.configuration.ConfigSchema.load(
+        YamlDocument config = com.github.nutt1101.configuration.ConfigSchema.load(
                 plugin.getDataFolder().toPath().resolve("config.yml"),
                 plugin.getResource("config.yml"), plugin.getLogger()::warning);
-        // Replace Bukkit's cached configuration only after validation and persistence succeed.
-        plugin.reloadConfig();
+        document = config;
 
         UsePAPI = config.getBoolean("integrations.placeholder-api.enabled", true);
-        locale = config.isSet("messages.locale") ? config.getString("messages.locale") : "en";
+        locale = config.contains("messages.locale") ? config.getString("messages.locale") : "en";
         entityFileCreate();
 
-        DropEnable = !config.isSet("drops.enabled") || config.getBoolean("drops.enabled");
-        DropNeedPermission = config.isSet("drops.require-permission") && config.getBoolean("drops.require-permission");
-        DropItemChance = config.isSet("drops.chance")
+        DropEnable = !config.contains("drops.enabled") || config.getBoolean("drops.enabled");
+        DropNeedPermission = config.contains("drops.require-permission") && config.getBoolean("drops.require-permission");
+        DropItemChance = config.contains("drops.chance")
                 ? config.getInt("drops.chance")
                 : 50;
         try {
-            DropItemMaterial = config.isSet("drops.material") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.material"))) : Material.EGG;
+            DropItemMaterial = config.contains("drops.material") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.material"))) : Material.EGG;
         } catch (IllegalArgumentException e) {
             plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropItemMaterial in config.yml, using default 'EGG' material.");
             DropItemMaterial = Material.EGG;
         }
 
         try {
-            DropMethod = config.isSet("drops.method") ? DropMethodType.valueOf(config.getString("drops.method").toUpperCase()) : DropMethodType.CHICKEN;
+            DropMethod = config.contains("drops.method") ? DropMethodType.valueOf(config.getString("drops.method").toUpperCase()) : DropMethodType.CHICKEN;
         } catch (IllegalArgumentException e) {
             plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropMethod in config.yml, using default 'CHICKEN' method.");
             DropMethod = DropMethodType.CHICKEN;
         }
 
         // Store as string instead of EntityType
-        DropEntityType = config.isSet("drops.entity-type") ? config.getString("drops.entity-type").toUpperCase() : "CHICKEN";
+        DropEntityType = config.contains("drops.entity-type") ? config.getString("drops.entity-type").toUpperCase() : "CHICKEN";
         if (!isValidEntityType(DropEntityType)) {
             plugin.getLogger().log(Level.WARNING, ChatColor.RED + "Invalid DropEntityType in config.yml, using default 'CHICKEN'.");
             DropEntityType = "CHICKEN";
         }
 
-        DropBlockType = config.isSet("drops.block-type") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.block-type"))) : Material.DIAMOND_ORE;
+        DropBlockType = config.contains("drops.block-type") ? Material.matchMaterial(Objects.requireNonNull(config.getString("drops.block-type"))) : Material.DIAMOND_ORE;
 
-        updatecheck = !config.isSet("Update-Check") || config.getBoolean("Update-Check");
+        updatecheck = !config.contains("Update-Check") || config.getBoolean("Update-Check");
 
         entityFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "entity.yml"));
 
-        catchSuccessSound = config.isSet("capture.success-sound") ? config.getString("capture.success-sound").toUpperCase()
+        catchSuccessSound = config.contains("capture.success-sound") ? config.getString("capture.success-sound").toUpperCase()
                 : "ENTITY_ARROW_HIT_PLAYER".toUpperCase();
 
-        recipeEnabled = !config.isSet("recipe.enabled") || config.getBoolean("recipe.enabled");
+        recipeEnabled = !config.contains("recipe.enabled") || config.getBoolean("recipe.enabled");
 
-        residenceFlag = config.isSet("integrations.residence.flags") ? config.getStringList("integrations.residence.flags")
+        residenceFlag = config.contains("integrations.residence.flags") ? config.getStringList("integrations.residence.flags")
                 : Arrays.asList("animalkilling");
 
-        griefPreventionFlag = config.isSet("integrations.grief-prevention.flags") ? config.getStringList("integrations.grief-prevention.flags")
+        griefPreventionFlag = config.contains("integrations.grief-prevention.flags") ? config.getStringList("integrations.grief-prevention.flags")
                 : Arrays.asList("Access");
-        allowCatchableTamedOwnerIsNull = !config.isSet("capture.allow-ownerless-tamed")
+        allowCatchableTamedOwnerIsNull = !config.contains("capture.allow-ownerless-tamed")
                 || config.getBoolean("capture.allow-ownerless-tamed");
-        ShowParticles = !config.isSet("capture.particles.enabled")
+        ShowParticles = !config.contains("capture.particles.enabled")
                 || config.getBoolean("capture.particles.enabled");
-        CustomParticles = config.isSet("capture.particles.type") ? config.getString("capture.particles.type") : "CLOUD";
+        CustomParticles = config.contains("capture.particles.type") ? config.getString("capture.particles.type") : "CLOUD";
         catchFailRate = config.getDouble("capture.fail-rate", 0.0);
         customModelData = config.getInt("items.catch-ball.custom-model-data", 0);
 
@@ -198,31 +199,31 @@ public class ConfigSetting {
 
         catchableEntity = List.copyOf(loadedEntities);
 
-        UseRes = !config.isSet("integrations.residence.enabled")
+        UseRes = !config.contains("integrations.residence.enabled")
                 || config.getBoolean("integrations.residence.enabled");
 
-        UseGF = !config.isSet("integrations.grief-prevention.enabled")
+        UseGF = !config.contains("integrations.grief-prevention.enabled")
                 || config.getBoolean("integrations.grief-prevention.enabled");
 
-        UseLands = !config.isSet("integrations.lands.enabled")
+        UseLands = !config.contains("integrations.lands.enabled")
                 || config.getBoolean("integrations.lands.enabled");
 
-        UsePAPI = !config.isSet("integrations.placeholder-api.enabled")
+        UsePAPI = !config.contains("integrations.placeholder-api.enabled")
                 || config.getBoolean("integrations.placeholder-api.enabled");
 
-        UseMM = !config.isSet("integrations.mythic-mobs.enabled")
+        UseMM = !config.contains("integrations.mythic-mobs.enabled")
                 || config.getBoolean("integrations.mythic-mobs.enabled");
 
-        UseRP = !config.isSet("integrations.red-protect.enabled")
+        UseRP = !config.contains("integrations.red-protect.enabled")
                 || config.getBoolean("integrations.red-protect.enabled");
 
-        UseSCS = !config.isSet("integrations.simple-claim-system.enabled")
+        UseSCS = !config.contains("integrations.simple-claim-system.enabled")
                 || config.getBoolean("integrations.simple-claim-system.enabled");
 
-        UseTowny = !config.isSet("integrations.towny.enabled")
+        UseTowny = !config.contains("integrations.towny.enabled")
                 || config.getBoolean("integrations.towny.enabled");
 
-        /*UseWG = !config.isSet("UseWG")
+        /*UseWG = !config.contains("UseWG")
                 || config.getBoolean("UseWG");
 
                 // TODO
@@ -286,17 +287,12 @@ public class ConfigSetting {
      * Save the entity.yml file if the catchableEntity changes.
      */
     public static synchronized void persistEntityList(Set<String> selection) throws IOException {
-        YamlConfiguration candidate = new YamlConfiguration();
-        try {
-            candidate.loadFromString(plugin.getConfig().saveToString());
-        } catch (org.bukkit.configuration.InvalidConfigurationException e) {
-            throw new IOException("Could not prepare configuration", e);
-        }
+        YamlDocument candidate = com.github.nutt1101.configuration.ConfigSchema.parse(document.dump());
         List<String> values = selection.stream().sorted().toList();
         candidate.set("capture.catchable-entities", values);
         com.github.nutt1101.configuration.ConfigSchema.save(
                 plugin.getDataFolder().toPath().resolve("config.yml"), candidate);
-        plugin.getConfig().set("capture.catchable-entities", values);
+        document = candidate;
         catchableEntity = List.copyOf(values);
     }
 

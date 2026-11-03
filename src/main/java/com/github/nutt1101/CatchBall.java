@@ -11,7 +11,6 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import revxrsal.commands.Lamp;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,7 +22,6 @@ import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
 import java.util.logging.Level;
 
 public class CatchBall extends JavaPlugin {
-    private FileConfiguration config = this.getConfig();
 
     public static Plugin plugin;
 

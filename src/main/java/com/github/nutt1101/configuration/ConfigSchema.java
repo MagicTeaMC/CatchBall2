@@ -3,10 +3,13 @@ package com.github.nutt1101.configuration;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import dev.dejvokep.boostedyaml.YamlDocument;
+import dev.dejvokep.boostedyaml.block.implementation.Section;
+import dev.dejvokep.boostedyaml.block.Block;
+import dev.dejvokep.boostedyaml.block.Comments;
+import dev.dejvokep.boostedyaml.utils.format.NodeRole;
+import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
+import java.io.ByteArrayInputStream;
 import org.bukkit.entity.EntityType;
 
 import java.io.IOException;
@@ -72,24 +75,23 @@ public final class ConfigSchema {
         return Collections.unmodifiableMap(paths);
     }
 
-    public static YamlConfiguration parse(String contents) {
-        YamlConfiguration config = new YamlConfiguration();
-        config.options().parseComments(true);
+    public static YamlDocument parse(String contents) {
         try {
-            config.loadFromString(contents);
-            return config;
-        } catch (InvalidConfigurationException e) {
-            throw new IllegalArgumentException("Invalid YAML; check indentation and value syntax", e);
+            return YamlDocument.create(new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8)),
+                    LoaderSettings.builder().setAutoUpdate(false).setCreateFileIfAbsent(false)
+                            .setAllowDuplicateKeys(false).setDetailedErrors(false).build());
+        } catch (IOException | RuntimeException error) {
+            throw new IllegalArgumentException("Invalid YAML; check indentation, duplicate keys and value syntax", error);
         }
     }
 
-    public static YamlConfiguration prepare(String contents, String defaults, Consumer<String> warning) {
+    public static YamlDocument prepare(String contents, String defaults, Consumer<String> warning) {
         return prepare(contents, defaults, warning, SERVER_MATERIALS);
     }
 
-    static YamlConfiguration prepare(String contents, String defaults, Consumer<String> warning, MaterialRules materials) {
-        YamlConfiguration source = parse(contents);
-        YamlConfiguration result = parse(defaults);
+    static YamlDocument prepare(String contents, String defaults, Consumer<String> warning, MaterialRules materials) {
+        YamlDocument source = parse(contents);
+        YamlDocument result = parse(defaults);
         Object version = source.get("config-version");
         if (version != null && (!(version instanceof Integer number) || number < 1 || number > VERSION)) {
             throw invalid("config-version", "must be an integer from 1 to " + VERSION);
@@ -102,43 +104,42 @@ public final class ConfigSchema {
                     warning.accept("Both " + oldPath + " and " + newPath + " are set; using " + newPath);
                 } else {
                     requireSections(source, newPath);
-                    Object value = source.get(oldPath);
-                    if (value instanceof ConfigurationSection section) {
-                        Map<String, Object> children = section.getValues(true);
-                        source.createSection(newPath);
-                        children.forEach((child, setting) -> {
-                            if (!(setting instanceof ConfigurationSection)) source.set(newPath + "." + child, setting);
-                        });
-                    } else {
-                        source.set(newPath, value);
-                    }
+                    source.move(oldPath, newPath);
                 }
-                source.set(oldPath, null);
+                source.remove(oldPath);
             }
         }
         // Drop the empty legacy container, retaining unknown children for administrator extensions.
-        if (source.isConfigurationSection("Recipe") && source.getConfigurationSection("Recipe").getKeys(false).isEmpty()) {
-            source.set("Recipe", null);
+        if (source.isSection("Recipe") && source.getSection("Recipe").getRoutesAsStrings(false).isEmpty()) {
+            source.remove("Recipe");
         }
-        for (String path : result.getKeys(true)) {
+        for (String path : result.getRoutesAsStrings(true)) {
             requireSections(source, path);
-            if (result.isConfigurationSection(path) && source.contains(path) && !source.isConfigurationSection(path)) {
+            if (result.isSection(path) && source.contains(path) && !source.isSection(path)) {
                 throw invalid(path, "must be a section");
             }
         }
         // Ingredients are a user-defined mapping: do not merge the default I into a custom recipe.
         if (source.contains("recipe.ingredients")) {
-            ConfigurationSection ingredients = result.getConfigurationSection("recipe.ingredients");
-            for (String key : new HashSet<>(ingredients.getKeys(false))) ingredients.set(key, null);
+            Section ingredients = result.getSection("recipe.ingredients");
+            for (String key : new HashSet<>(ingredients.getRoutesAsStrings(false))) ingredients.remove(key);
         }
-        for (String path : source.getKeys(true)) {
-            if (source.isConfigurationSection(path)) {
-                if (!result.isConfigurationSection(path)) result.createSection(path);
+        for (String path : source.getRoutesAsStrings(true)) {
+            Block<?> sourceBlock = source.getBlock(path);
+            if (source.isSection(path)) {
+                if (!result.isSection(path)) result.createSection(path);
+                // Keep administrator comments on sections, including inline comments.
+                for (NodeRole role : NodeRole.values()) {
+                    for (Comments.Position position : Comments.Position.values()) {
+                        var comments = Comments.get(sourceBlock, role, position);
+                        if (comments != null && !comments.isEmpty())
+                            Comments.set(result.getBlock(path), role, position, comments);
+                    }
+                }
             } else {
-                result.set(path, source.get(path));
+                // Copy the block rather than just its value so inline comments survive.
+                result.set(path, sourceBlock);
             }
-            if (!source.getComments(path).isEmpty()) result.setComments(path, source.getComments(path));
-            if (!source.getInlineComments(path).isEmpty()) result.setInlineComments(path, source.getInlineComments(path));
         }
         Object chance = result.get("drops.chance");
         if (chance instanceof String text && text.endsWith("%")) {
@@ -153,18 +154,18 @@ public final class ConfigSchema {
         return result;
     }
 
-    private static void requireSections(ConfigurationSection config, String path) {
+    private static void requireSections(Section config, String path) {
         for (int dot = path.indexOf('.'); dot >= 0; dot = path.indexOf('.', dot + 1)) {
             String parent = path.substring(0, dot);
-            if (config.contains(parent) && !config.isConfigurationSection(parent)) {
+            if (config.contains(parent) && !config.isSection(parent)) {
                 throw invalid(parent, "must be a section");
             }
         }
     }
 
-    private static void validate(YamlConfiguration config, YamlConfiguration defaults, MaterialRules materials) {
-        for (String path : defaults.getKeys(true)) {
-            if (defaults.isConfigurationSection(path) || path.startsWith("recipe.ingredients.")) continue;
+    private static void validate(YamlDocument config, YamlDocument defaults, MaterialRules materials) {
+        for (String path : defaults.getRoutesAsStrings(true)) {
+            if (defaults.isSection(path) || path.startsWith("recipe.ingredients.")) continue;
             Object value = config.get(path);
             Object fallback = defaults.get(path);
             if (fallback instanceof Boolean && !(value instanceof Boolean)) throw invalid(path, "must be true or false");
@@ -202,7 +203,7 @@ public final class ConfigSchema {
         validateRecipe(config, materials);
     }
 
-    private static void range(YamlConfiguration config, String path, double min, double max, boolean integer) {
+    private static void range(YamlDocument config, String path, double min, double max, boolean integer) {
         Object value = config.get(path);
         if (!(value instanceof Number n) || !Double.isFinite(n.doubleValue()) || n.doubleValue() < min
                 || n.doubleValue() > max || (integer && n.doubleValue() != Math.rint(n.doubleValue()))) {
@@ -210,7 +211,7 @@ public final class ConfigSchema {
         }
     }
 
-    private static <E extends Enum<E>> void enumValue(YamlConfiguration config, String path, Class<E> type) {
+    private static <E extends Enum<E>> void enumValue(YamlDocument config, String path, Class<E> type) {
         String value = config.getString(path).toUpperCase(Locale.ROOT);
         try {
             Enum.valueOf(type, value);
@@ -226,19 +227,19 @@ public final class ConfigSchema {
         return material;
     }
 
-    private static void validateRecipe(YamlConfiguration config, MaterialRules materials) {
+    private static void validateRecipe(YamlDocument config, MaterialRules materials) {
         List<String> shape = config.getStringList("recipe.shape");
         if (shape.isEmpty() || shape.size() > 3 || shape.getFirst().isEmpty() || shape.getFirst().length() > 3
                 || shape.stream().anyMatch(row -> row.length() != shape.getFirst().length())
                 || shape.stream().allMatch(String::isBlank)) throw invalid("recipe.shape", "must have 1–3 equal-width rows of 1–3 characters and at least one ingredient");
-        ConfigurationSection ingredients = config.getConfigurationSection("recipe.ingredients");
+        Section ingredients = config.getSection("recipe.ingredients");
         if (ingredients == null) throw invalid("recipe.ingredients", "must be a section");
         Set<Character> used = new HashSet<>();
         shape.forEach(row -> row.chars().filter(c -> c != ' ').forEach(c -> used.add((char) c)));
         for (char symbol : used) {
             if (!ingredients.contains(String.valueOf(symbol))) throw invalid("recipe.ingredients", "missing ingredient for " + symbol);
         }
-        for (String key : ingredients.getKeys(false)) {
+        for (String key : ingredients.getRoutesAsStrings(false)) {
             String path = "recipe.ingredients." + key;
             if (key.length() != 1 || key.equals(" ") || !used.contains(key.charAt(0))) throw invalid(path, "must be a single character used in the shape");
             Object value = ingredients.get(key);
@@ -253,17 +254,17 @@ public final class ConfigSchema {
         }
     }
 
-    public static YamlConfiguration load(Path file, InputStream bundled, Consumer<String> warning) {
+    public static YamlDocument load(Path file, InputStream bundled, Consumer<String> warning) {
         return load(file, bundled, warning, SERVER_MATERIALS);
     }
 
-    static YamlConfiguration load(Path file, InputStream bundled, Consumer<String> warning, MaterialRules materials) {
+    static YamlDocument load(Path file, InputStream bundled, Consumer<String> warning, MaterialRules materials) {
         if (bundled == null) throw new IllegalArgumentException("Missing bundled config.yml");
         try (bundled) {
             String defaults = new String(bundled.readAllBytes(), StandardCharsets.UTF_8);
             String original = Files.exists(file) ? Files.readString(file) : defaults;
-            YamlConfiguration candidate = prepare(original, defaults, warning, materials);
-            YamlConfiguration previous = parse(original);
+            YamlDocument candidate = prepare(original, defaults, warning, materials);
+            YamlDocument previous = parse(original);
             boolean migrating = !Objects.equals(previous.get("config-version"), VERSION)
                     || LEGACY_PATHS.keySet().stream().anyMatch(previous::contains);
             if (Files.exists(file) && migrating) {
@@ -278,11 +279,11 @@ public final class ConfigSchema {
     }
 
     /** Write beside the target then replace it, so interrupted writes cannot truncate the config. */
-    public static void save(Path file, FileConfiguration config) throws IOException {
+    public static void save(Path file, YamlDocument config) throws IOException {
         Files.createDirectories(file.toAbsolutePath().getParent());
         Path temp = Files.createTempFile(file.toAbsolutePath().getParent(), "config-", ".tmp");
         try {
-            Files.writeString(temp, config.saveToString(), StandardCharsets.UTF_8);
+            Files.writeString(temp, config.dump(), StandardCharsets.UTF_8);
             try {
                 Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException e) {

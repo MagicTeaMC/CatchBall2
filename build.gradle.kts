@@ -68,6 +68,7 @@ dependencies {
     implementation("net.momirealms:sparrow-ui:beta.38")
     implementation("io.github.revxrsal:lamp.common:4.0.0-rc.18")
     implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.18")
+    implementation("dev.dejvokep:boosted-yaml:1.3.7")
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
     implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
@@ -127,6 +128,7 @@ tasks {
         relocate("net.momirealms.sparrow.ui", "tw.maoyue.catchball.libs.sparrow.ui")
 
         relocate("revxrsal.commands", "tw.maoyue.catchball.libs.lamp")
+        relocate("dev.dejvokep.boostedyaml", "tw.maoyue.catchball.libs.boostedyaml")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
         relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 

@@ -69,8 +69,8 @@ class ConfigSchemaTest {
         var result = ConfigSchema.prepare("DropEnable: true\ndrops:\n  enabled: false\n", defaults(), warnings::add, MATERIALS);
         assertFalse(result.getBoolean("drops.enabled"));
         assertEquals(1, warnings.size());
-        String serialized = result.saveToString();
-        assertEquals(serialized, ConfigSchema.prepare(serialized, defaults(), ignored -> {}, MATERIALS).saveToString());
+        String serialized = result.dump();
+        assertEquals(serialized, ConfigSchema.prepare(serialized, defaults(), ignored -> {}, MATERIALS).dump());
     }
 
     @Test void rejectsBadValuesAndRecipeBeforeWriting() throws Exception {
@@ -104,16 +104,16 @@ class ConfigSchemaTest {
 
     @Test void migratesEveryLegacyPathAndSavesGuiEditsToNewPath() throws Exception {
         var bundled = ConfigSchema.parse(defaults());
-        var legacy = new org.bukkit.configuration.file.YamlConfiguration();
+        var legacy = ConfigSchema.parse("");
         for (var entry : ConfigSchema.LEGACY_PATHS.entrySet()) {
             Object value = bundled.get(entry.getValue());
-            if (value instanceof org.bukkit.configuration.ConfigurationSection section) {
-                legacy.createSection(entry.getKey(), section.getValues(false));
+            if (value instanceof dev.dejvokep.boostedyaml.block.implementation.Section section) {
+                legacy.set(entry.getKey(), section.getStringRouteMappedValues(false));
             } else {
                 legacy.set(entry.getKey(), value);
             }
         }
-        var migrated = ConfigSchema.prepare(legacy.saveToString(), defaults(), ignored -> {}, MATERIALS);
+        var migrated = ConfigSchema.prepare(legacy.dump(), defaults(), ignored -> {}, MATERIALS);
         for (var entry : ConfigSchema.LEGACY_PATHS.entrySet()) {
             assertFalse(migrated.contains(entry.getKey()), entry.getKey());
             assertTrue(migrated.contains(entry.getValue()), entry.getValue());
@@ -124,6 +124,27 @@ class ConfigSchemaTest {
         var reloaded = ConfigSchema.load(file, new ByteArrayInputStream(defaults().getBytes(StandardCharsets.UTF_8)), ignored -> {}, MATERIALS);
         assertEquals(List.of("COW"), reloaded.getStringList("capture.catchable-entities"));
         assertFalse(reloaded.contains("CatchableEntity"));
+    }
+
+    @Test void rejectsDuplicateKeysAndPreservesMigrationComments() throws Exception {
+        assertThrows(IllegalArgumentException.class, () -> ConfigSchema.prepare(
+                "drops:\n  chance: 20\n  chance: 30\n", defaults(), ignored -> {}, MATERIALS));
+        var result = ConfigSchema.prepare("""
+                # My custom capture list
+                CatchableEntity: [COW] # Keep this note
+                Recipe:
+                  key:
+                    # My recipe ingredient
+                    X: EGG
+                  shape: [X]
+                custom-extension: retained # Plugin extension
+                """, defaults(), ignored -> {}, MATERIALS);
+        String saved = result.dump();
+        assertTrue(saved.contains("My custom capture list"));
+        assertTrue(saved.contains("Keep this note"));
+        assertTrue(saved.contains("My recipe ingredient"));
+        assertTrue(saved.contains("Plugin extension"));
+        assertEquals(saved, ConfigSchema.prepare(saved, defaults(), ignored -> {}, MATERIALS).dump());
     }
 
     @Test void acceptsDisabledSoundAndFutureEntityNames() throws Exception {

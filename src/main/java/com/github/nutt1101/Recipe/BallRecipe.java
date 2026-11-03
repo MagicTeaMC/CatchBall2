@@ -7,8 +7,8 @@ import com.github.nutt1101.items.DropItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import dev.dejvokep.boostedyaml.YamlDocument;
+import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 
@@ -20,11 +20,11 @@ public class BallRecipe {
             Bukkit.removeRecipe(key);
             return;
         }
-        FileConfiguration config = CatchBall.plugin.getConfig();
+        YamlDocument config = ConfigSetting.configuration();
         ShapedRecipe recipe = new ShapedRecipe(key, Ball.makeBall());
         recipe.shape(config.getStringList("recipe.shape").toArray(String[]::new));
-        ConfigurationSection ingredients = config.getConfigurationSection("recipe.ingredients");
-        for (String symbol : ingredients.getKeys(false)) {
+        Section ingredients = config.getSection("recipe.ingredients");
+        for (String symbol : ingredients.getRoutesAsStrings(false)) {
             Object ingredient = ingredients.get(symbol);
             if (ingredient instanceof String name) {
                 if (name.equalsIgnoreCase("DROPITEM")) {
