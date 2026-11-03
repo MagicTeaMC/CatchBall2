@@ -1,5 +1,7 @@
 package com.github.nutt1101.menu;
 
+import com.github.nutt1101.utils.MessageText;
+
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.HeadDrop;
@@ -113,7 +115,7 @@ public final class CatchableMenu {
 
     private Component text(String key, String fallback) { return text(key, fallback, Map.of()); }
     private Component text(String key, String fallback, Map<String, String> values) {
-        return MenuText.render(messages.getOrDefault(key, fallback), values);
+        return MessageText.render(messages.getOrDefault(key, fallback), values);
     }
 
     private ItemStack icon(Material material, Component name, Component... lore) {

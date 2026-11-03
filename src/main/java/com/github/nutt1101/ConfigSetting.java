@@ -240,6 +240,7 @@ public class ConfigSetting {
     public static void entityFileCreate() {
         File file = new File(plugin.getDataFolder(), "entity.yml");
         InputStream inputStream = plugin.getResource("entity/" + locale + ".yml");
+        if (inputStream == null) inputStream = plugin.getResource("entity/en.yml");
 
         if (inputStream != null) {
             try {
@@ -262,10 +263,8 @@ public class ConfigSetting {
      * @return entityDisplayName
      */
     public static String getEntityDisplayName(String entityName) {
-        if (entityFile.getConfigurationSection("EntityList").contains(entityName)) {
-            return entityFile.getString("EntityList." + entityName.toUpperCase() + ".DisplayName");
-        }
-        return entityName;
+        if (entityName == null || entityName.isBlank()) return "";
+        return entityFile.getString("EntityList." + entityName.toUpperCase(Locale.ROOT) + ".DisplayName", entityName);
     }
 
     /**
@@ -275,13 +274,17 @@ public class ConfigSetting {
      * @param entity   replace {ENTITY} from source message
      * @return replaced message
      */
-    public static String toChat(String message, String location, String entity) {
-        message = message.contains("{BALL}") ? message.replace("{BALL}", TranslationFileReader.catchBallName)
-                : message;
-        message = message.contains("{LOCATION}") ? message.replace("{LOCATION}", location) : message;
-        message = message.contains("{ENTITY}") ? message.replace("{ENTITY}", getEntityDisplayName(entity)) : message;
+    public static net.kyori.adventure.text.Component toChat(String message, String location, String entity) {
+        return toChat(message, location, entity, Map.of());
+    }
 
-        return ChatColor.translateAlternateColorCodes('&', message);
+    public static net.kyori.adventure.text.Component toChat(String message, String location, String entity,
+                                                          Map<String, String> placeholders) {
+        Map<String, String> values = new HashMap<>(placeholders);
+        values.put("location", location);
+        values.put("entity", com.github.nutt1101.utils.MessageText.plain(getEntityDisplayName(entity)));
+        return com.github.nutt1101.utils.MessageText.render(message, values,
+                Map.of("ball", com.github.nutt1101.utils.MessageText.render(TranslationFileReader.catchBallName, Map.of())));
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.github.nutt1101.command;
 
-import com.github.nutt1101.menu.MenuText;
+import com.github.nutt1101.utils.MessageText;
 import com.github.nutt1101.utils.TranslationFileReader;
 import java.util.Map;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
@@ -12,7 +12,7 @@ import revxrsal.commands.node.ParameterNode;
 /** Keep configured translations for errors raised by Lamp's argument parser. */
 public final class CommandErrors extends BukkitExceptionHandler {
     private void reply(BukkitCommandActor actor, String template) {
-        actor.sender().sendMessage(MenuText.render(template, Map.of()));
+        actor.sender().sendMessage(MessageText.render(template, Map.of()));
     }
 
     @Override public void onNoPermission(NoPermissionException error, BukkitCommandActor actor) {
@@ -38,7 +38,7 @@ public final class CommandErrors extends BukkitExceptionHandler {
     }
 
     @Override public void onInvalidPlayer(InvalidPlayerException error, BukkitCommandActor actor) {
-        actor.sender().sendMessage(MenuText.render(TranslationFileReader.unknownOrOfflinePlayer,
+        actor.sender().sendMessage(MessageText.render(TranslationFileReader.unknownOrOfflinePlayer,
                 Map.of("player", error.input())));
     }
 }

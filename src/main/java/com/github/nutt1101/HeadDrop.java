@@ -3,7 +3,6 @@ package com.github.nutt1101;
 import com.github.nutt1101.event.HitEvent;
 import com.github.nutt1101.utils.NBTHandler;
 import com.github.nutt1101.utils.TranslationFileReader;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -19,14 +18,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
 
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class HeadDrop {
     private final Plugin plugin = CatchBall.plugin;
@@ -52,27 +47,18 @@ public class HeadDrop {
         String location = "(" + hitEntity.getWorld().getName() + ") " +
                 HitEvent.getCoordinate(hitEntity.getLocation());
 
-        if (hitEntity.getCustomName() != null) {
-            headMeta.setDisplayName(ChatColor.WHITE + hitEntity.getCustomName());
-        } else {
-            headMeta.setDisplayName(ChatColor.WHITE + entityFile.getString("EntityList." + hitEntity.getType().toString() + ".DisplayName"));
-        }
-
-        List<String> headLore = new ArrayList<>();
-
-        if (player == null) {
-            headLore.addAll(TranslationFileReader.dropSkullLore.stream().map(lore -> ChatColor.translateAlternateColorCodes('&', lore).
-                    replace("{ENTITY}", hitEntity.getType().toString()).replace("{PLAYER}", "Dispenser").replace("{TIME}", format.format(now)).
-                    replace("{LOCATION}", location)).collect(Collectors.toList()));
-        } else {
-            headLore.addAll(TranslationFileReader.dropSkullLore.stream().map(lore -> ChatColor.translateAlternateColorCodes('&', lore).
-                    replace("{ENTITY}", hitEntity.getType().toString()).replace("{PLAYER}", player.getName()).replace("{TIME}", format.format(now)).
-                    replace("{LOCATION}", location)).collect(Collectors.toList()));
-        }
+        headMeta.displayName(hitEntity.customName() != null ? hitEntity.customName()
+                : com.github.nutt1101.utils.MessageText.render(
+                        "<white>" + ConfigSetting.getEntityDisplayName(hitEntity.getType().name()), java.util.Map.of()));
+        var placeholders = java.util.Map.of("entity", hitEntity.getType().name(),
+                "player", player == null ? "Dispenser" : player.getName(),
+                "time", format.format(now), "location", location);
+        var headLore = TranslationFileReader.dropSkullLore.stream()
+                .map(line -> com.github.nutt1101.utils.MessageText.render(line, placeholders)).toList();
 
         headMeta = NBTHandler.saveEntityNBT(plugin, hitEntity, headMeta);
 
-        headMeta.setLore(headLore);
+        headMeta.lore(headLore);
         entityHead.setItemMeta(headMeta);
 
         return skullTextures(entityHead, entityFile, hitEntity.getType().toString());

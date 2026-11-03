@@ -5,7 +5,7 @@ import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.items.DropItem;
-import com.github.nutt1101.menu.MenuText;
+import com.github.nutt1101.utils.MessageText;
 import com.github.nutt1101.utils.TranslationFileReader;
 import java.io.IOException;
 import java.lang.annotation.*;
@@ -48,7 +48,7 @@ public final class Command {
             ConfigSetting.checkConfig();
             reply(actor.sender(), TranslationFileReader.reloadSuccess);
         } catch (IllegalArgumentException error) {
-            actor.sender().sendMessage(MenuText.render(TranslationFileReader.reloadFailed,
+            actor.sender().sendMessage(MessageText.render(TranslationFileReader.reloadFailed,
                     Map.of("reason", error.getMessage())));
         }
     }
@@ -89,15 +89,15 @@ public final class Command {
                 reply(player, TranslationFileReader.playerInventoryFull);
                 remaining.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
             }
-            actor.sender().sendMessage(MenuText.render(TranslationFileReader.successGiveItemToPlayer,
-                    Map.of("item", MenuText.plain(item.equalsIgnoreCase("catchball")
-                            ? TranslationFileReader.catchBallName : TranslationFileReader.dropItemName),
-                            "player", player.getName())));
+            actor.sender().sendMessage(MessageText.render(TranslationFileReader.successGiveItemToPlayer,
+                    Map.of("player", player.getName()), Map.of("item", MessageText.render(
+                            item.equalsIgnoreCase("catchball") ? TranslationFileReader.catchBallName
+                                    : TranslationFileReader.dropItemName, Map.of()))));
         });
     }
 
     private static void reply(CommandSender sender, String message) {
-        sender.sendMessage(MenuText.render(message, Map.of()));
+        sender.sendMessage(MessageText.render(message, Map.of()));
     }
 
     private void editSelection(CommandSender sender, String entity, boolean adding) {
@@ -133,7 +133,7 @@ public final class Command {
                     : (adding ? TranslationFileReader.successAddEntity : TranslationFileReader.successRemove);
             sender.sendMessage(ConfigSetting.toChat(message, "", all ? "" : targets.iterator().next()));
         } catch (IOException error) {
-            sender.sendMessage(MenuText.render(TranslationFileReader.localeYamlConfig.getString("Menu.save-failed",
+            sender.sendMessage(MessageText.render(TranslationFileReader.localeYamlConfig.getString("Menu.save-failed",
                     "<red>Could not save the selection. Please try again."), Map.of()));
             CatchBall.plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not save entity selection", error);
         }

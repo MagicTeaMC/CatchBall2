@@ -55,9 +55,9 @@ public class HitEvent implements Listener {
             if (!checkCatchBall(event.getEntity())) { return; }
 
             if (!player.hasPermission("catchball.use")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
                         getCoordinate(event.getHitBlock() == null ? Objects.requireNonNull(event.getHitEntity()).getLocation() : event.getHitBlock().getLocation())
-                        , "").replace("{BALL}", TranslationFileReader.catchBallName)));
+                        , ""));
 
                 event.getEntity().remove();
 
@@ -132,8 +132,8 @@ public class HitEvent implements Listener {
 
         // Check permissions
         if (!player.hasPermission("catchball.use")) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
-                    getCoordinate(targetEntity.getLocation()), "").replace("{BALL}", TranslationFileReader.catchBallName)));
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
+                    getCoordinate(targetEntity.getLocation()), ""));
             return;
         }
 
@@ -293,8 +293,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.residenceFlag) {
             if (!residence.getPermissions().playerHas(player, Flags.valueOf(flags.toLowerCase()) , true)) {
 
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "").
-                        replace("{FLAG}", flags));
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "", java.util.Map.of("flag", flags)));
 
                 return false;
             }
@@ -354,8 +353,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.griefPreventionFlag) {
             if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
                 player.sendMessage(ConfigSetting.toChat(
-                                TranslationFileReader.noResidencePermissions, "", "")
-                        .replace("{FLAG}", flags));
+                                TranslationFileReader.noResidencePermissions, "", "", java.util.Map.of("flag", flags)));
 
                 return false;
             }
