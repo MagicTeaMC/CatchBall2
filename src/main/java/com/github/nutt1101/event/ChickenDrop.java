@@ -17,13 +17,12 @@ public class ChickenDrop implements Listener {
 
     @EventHandler
     public void ChickenDropEgg(EntityDropItemEvent event) {
-        if (ConfigSetting.DropMethod != ConfigSetting.DropMethodType.CHICKEN) { return; }
+        if (!ConfigSetting.DropEnable || ConfigSetting.DropMethod != ConfigSetting.DropMethodType.CHICKEN) { return; }
         if (!event.getItemDrop().getItemStack().equals(new ItemStack(Material.EGG))) { return; }
 
-        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
 
         if (event.getEntityType().equals(chicken)) {
-            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
+            if (chance.nextInt(100) < ConfigSetting.DropItemChance) {
                 event.setCancelled(true);
                 event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), DropItem.makeDropItem());
             }

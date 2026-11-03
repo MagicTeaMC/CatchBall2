@@ -2,7 +2,6 @@ package com.github.nutt1101.command;
 
 import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.utils.TranslationFileReader;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -11,7 +10,7 @@ import java.util.List;
 public class CommandCheck {
     private static List<String> argmumentList = Arrays.asList("reload", "list", "add", "remove", "give");
 
-    public static Boolean check(CommandSender sender, Command command, String label, String[] args) {
+    public static Boolean check(CommandSender sender, String[] args) {
 
         // Check if player has permission
         if (!(sender.hasPermission("catchball.op"))) {

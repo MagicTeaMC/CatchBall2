@@ -7,7 +7,8 @@ import com.github.nutt1101.items.DropItem;
 import com.github.nutt1101.utils.TranslationFileReader;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -17,197 +18,207 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Command implements CommandExecutor {
-    private List<String> commandArgument = CommandCheck.getCommandArgument();
-    private Set<String> entityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
+public class Command implements BasicCommand {
+    private final List<String> commandArgument = CommandCheck.getCommandArgument();
+    private final TabComplete tabComplete = new TabComplete();
 
     @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
-        if (command.getName().equals("ctb")) {
+    public void execute(CommandSourceStack source, String[] args) {
+        handleCommand(source.getSender(), args);
+    }
 
-            if (!(CommandCheck.check(sender, command, label, args))) {
+    @Override
+    public java.util.Collection<String> suggest(CommandSourceStack source, String[] args) {
+        return tabComplete.suggest(source.getSender(), args);
+    }
+
+    private boolean handleCommand(CommandSender sender, String[] args) {
+        if (!(CommandCheck.check(sender, args))) {
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("reload")) {
+            try {
+                ConfigSetting.checkConfig();
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadFailed, "", "")
+                        .replace("{REASON}", e.getMessage()));
+                return true;
+            }
+            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadSuccess, "", ""));
+            return true;
+
+        } else if (args[0].equalsIgnoreCase("list")) {
+            if (!checkSenderPlayer(sender)) {
                 return true;
             }
 
-            /* player use "/ctb get" command
-            player will get a catchBall*/
-            if (args[0].equalsIgnoreCase("reload")) {
-                ConfigSetting.checkConfig();
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadSuccess, "", ""));
+            new CatchableList().openCatchableList((Player) sender, 1);
+
+        } else if (args[0].equalsIgnoreCase("add")) {
+            if (args.length == 1) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.addEntityDoesNotExist, "", ""));
                 return true;
+            }
 
-            } else if (args[0].equalsIgnoreCase("list")) {
-                if (!checkSenderPlayer(sender)) {
-                    return true;
-                }
+            if (args[1].equalsIgnoreCase("all")) {
+                Set<String> entityList = ConfigSetting.entityFile.getConfigurationSection("EntityList")
+                        .getKeys(false);
+                int addedCount = 0;
+                int skippedCount = 0;
+                List<String> skippedEntities = new ArrayList<>();
 
-                new CatchableList().openCatchableList((Player) sender, 1);
-
-            } else if (args[0].equalsIgnoreCase("add")) {
-                if (args.length == 1) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.addEntityDoesNotExist, "", ""));
-                    return true;
-                }
-
-                if (args[1].equalsIgnoreCase("all")) {
-                    Set<String> entityList = ConfigSetting.entityFile.getConfigurationSection("EntityList")
-                            .getKeys(false);
-                    int addedCount = 0;
-                    int skippedCount = 0;
-                    List<String> skippedEntities = new ArrayList<>();
-
-                    for (String entity : entityList) {
-                        EntityType entityType = safeGetEntityType(entity);
-                        if (entityType == null) {
-                            // Entity doesn't exist in this MC version - skip it
-                            skippedCount++;
-                            skippedEntities.add(entity);
-                            continue;
-                        }
-
-                        if (!ConfigSetting.catchableEntity.contains(entityType)) {
-                            ConfigSetting.catchableEntity.add(String.valueOf(entityType));
-                            addedCount++;
-                        }
+                for (String entity : entityList) {
+                    EntityType entityType = safeGetEntityType(entity);
+                    if (entityType == null) {
+                        // Entity doesn't exist in this MC version - skip it
+                        skippedCount++;
+                        skippedEntities.add(entity);
+                        continue;
                     }
 
-                    // Provide detailed feedback
-                    if (addedCount > 0) {
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                TranslationFileReader.allEntityAddSuccess + " §7(" + addedCount + " entities added)"));
-                        ConfigSetting.saveEntityList();
-
-                        // Warn about skipped entities if any
-                        if (skippedCount > 0) {
-                            sender.sendMessage(ChatColor.YELLOW + "Warning: " + skippedCount +
-                                    " entities were skipped (not available in this MC version)");
-                        }
-                    } else if (skippedCount > 0) {
-                        sender.sendMessage(ChatColor.YELLOW + "No entities were added. " + skippedCount +
-                                " entities in config are not available in this Minecraft version.");
-                    } else {
-                        sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.entityDoesExists, "", ""));
+                    if (!ConfigSetting.catchableEntity.contains(entityType.name())) {
+                        ConfigSetting.catchableEntity.add(String.valueOf(entityType));
+                        addedCount++;
                     }
-                    return true;
                 }
 
-                // Check if entity exists in config (case insensitive)
-                String matchedEntity = findMatchingEntity(args[1]);
-                if (matchedEntity == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                    return true;
-                }
+                // Provide detailed feedback
+                if (addedCount > 0) {
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            TranslationFileReader.allEntityAddSuccess + " §7(" + addedCount + " entities added)"));
+                    ConfigSetting.saveEntityList();
 
-                // Safely get EntityType
-                EntityType entityType = safeGetEntityType(matchedEntity);
-                if (entityType == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                    return true;
-                }
-
-                if (ConfigSetting.catchableEntity.contains(entityType)) {
+                    // Warn about skipped entities if any
+                    if (skippedCount > 0) {
+                        sender.sendMessage(ChatColor.YELLOW + "Warning: " + skippedCount +
+                                " entities were skipped (not available in this MC version)");
+                    }
+                } else if (skippedCount > 0) {
+                    sender.sendMessage(ChatColor.YELLOW + "No entities were added. " + skippedCount +
+                            " entities in config are not available in this Minecraft version.");
+                } else {
                     sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.entityDoesExists, "", ""));
-                    return true;
                 }
-
-                ConfigSetting.catchableEntity.add(String.valueOf(entityType));
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successAddEntity, "", entityType.name()));
-                ConfigSetting.saveEntityList();
                 return true;
+            }
 
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                if (args.length == 1) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityDoesNotExist, "", ""));
-                    return true;
-                }
+            // Check if entity exists in config (case insensitive)
+            String matchedEntity = findMatchingEntity(args[1]);
+            if (matchedEntity == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
+                return true;
+            }
 
-                if (args[1].equalsIgnoreCase("all")) {
-                    int removedCount = ConfigSetting.catchableEntity.size();
-                    ConfigSetting.catchableEntity.clear();
+            // Safely get EntityType
+            EntityType entityType = safeGetEntityType(matchedEntity);
+            if (entityType == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
+                return true;
+            }
 
-                    if (removedCount > 0) {
-                        sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                TranslationFileReader.allEntityRemoveSuccess + " §7(" + removedCount + " entities removed)"));
-                        ConfigSetting.saveEntityList();
-                    } else {
-                        sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityNotFound, "", ""));
-                    }
-                    return true;
-                }
+            if (ConfigSetting.catchableEntity.contains(entityType.name())) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.entityDoesExists, "", ""));
+                return true;
+            }
 
-                // Check if entity exists in config (case insensitive)
-                String matchedEntity = findMatchingEntity(args[1]);
-                if (matchedEntity == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                    return true;
-                }
+            ConfigSetting.catchableEntity.add(String.valueOf(entityType));
+            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successAddEntity, "", entityType.name()));
+            ConfigSetting.saveEntityList();
+            return true;
 
-                // Safely get EntityType
-                EntityType entityType = safeGetEntityType(matchedEntity);
-                if (entityType == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
-                    return true;
-                }
+        } else if (args[0].equalsIgnoreCase("remove")) {
+            if (args.length == 1) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityDoesNotExist, "", ""));
+                return true;
+            }
 
-                if (!ConfigSetting.catchableEntity.contains(entityType)) {
+            if (args[1].equalsIgnoreCase("all")) {
+                int removedCount = ConfigSetting.catchableEntity.size();
+                ConfigSetting.catchableEntity.clear();
+
+                if (removedCount > 0) {
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            TranslationFileReader.allEntityRemoveSuccess + " §7(" + removedCount + " entities removed)"));
+                    ConfigSetting.saveEntityList();
+                } else {
                     sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityNotFound, "", ""));
-                    return true;
                 }
-
-                ConfigSetting.catchableEntity.remove(entityType);
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successRemove, "", entityType.name()));
-                ConfigSetting.saveEntityList();
                 return true;
+            }
 
-            } else if (args[0].equalsIgnoreCase("give")) {
-                if (args.length < 3) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
-                    return true;
-                }
+            // Check if entity exists in config (case insensitive)
+            String matchedEntity = findMatchingEntity(args[1]);
+            if (matchedEntity == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
+                return true;
+            }
 
-                Player player = Bukkit.getPlayer(args[1]);
+            // Safely get EntityType
+            EntityType entityType = safeGetEntityType(matchedEntity);
+            if (entityType == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
+                return true;
+            }
 
-                if (player == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownOrOfflinePlayer, "", "")
-                            .replace("{PLAYER}", args[1]));
-                    return true;
-                }
+            if (!ConfigSetting.catchableEntity.contains(entityType.name())) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.removeEntityNotFound, "", ""));
+                return true;
+            }
 
-                if (checkItem(args[2]) == null) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.itemNameError, "", ""));
-                    return true;
-                }
+            ConfigSetting.catchableEntity.remove(entityType.name());
+            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successRemove, "", entityType.name()));
+            ConfigSetting.saveEntityList();
+            return true;
 
-                int itemAmount = 1;
-                if (args.length >= 4) {
-                    try {
-                        itemAmount = Integer.parseInt(args[3]);
-                        if (itemAmount <= 0) {
-                            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
-                            return true;
-                        }
-                    } catch (NumberFormatException e) {
+        } else if (args[0].equalsIgnoreCase("give")) {
+            if (args.length < 3) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
+                return true;
+            }
+
+            Player player = Bukkit.getPlayer(args[1]);
+
+            if (player == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownOrOfflinePlayer, "", "")
+                        .replace("{PLAYER}", args[1]));
+                return true;
+            }
+
+            if (checkItem(args[2]) == null) {
+                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.itemNameError, "", ""));
+                return true;
+            }
+
+            int itemAmount = 1;
+            if (args.length >= 4) {
+                try {
+                    itemAmount = Integer.parseInt(args[3]);
+                    if (itemAmount <= 0) {
                         sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
                         return true;
                     }
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
+                    return true;
                 }
-
-                givePlayerItem(player, checkItem(args[2]), itemAmount);
-
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
-                        .replace("{ITEM}", args[2].equalsIgnoreCase("catchball") ? TranslationFileReader.catchBallName
-                                : TranslationFileReader.dropItemName)
-                        .replace("{PLAYER}", player.getName())
-                        .replace("&", "§"));
-
-                return true;
-
-            } else if (!commandArgument.contains(args[0])) {
-
-                // player entered an unknown argument
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownCommandArgument, "", ""));
-                return true;
             }
+
+            givePlayerItem(player, checkItem(args[2]), itemAmount);
+
+            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
+                    .replace("{ITEM}", args[2].equalsIgnoreCase("catchball") ? TranslationFileReader.catchBallName
+                            : TranslationFileReader.dropItemName)
+                    .replace("{PLAYER}", player.getName())
+                    .replace("&", "§"));
+
+            return true;
+
+        } else if (!commandArgument.contains(args[0])) {
+
+            // player entered an unknown argument
+            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownCommandArgument, "", ""));
+            return true;
         }
 
         return true;
@@ -233,7 +244,7 @@ public class Command implements CommandExecutor {
      * @return Matching entity name from config, or null if not found
      */
     private String findMatchingEntity(String inputEntity) {
-        for (String entity : entityList) {
+        for (String entity : ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false)) {
             if (entity.equalsIgnoreCase(inputEntity)) {
                 return entity;
             }

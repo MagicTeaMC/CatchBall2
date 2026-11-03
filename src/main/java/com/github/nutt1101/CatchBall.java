@@ -2,11 +2,10 @@ package com.github.nutt1101;
 
 import cn.handyplus.lib.adapter.HandySchedulerUtil;
 import com.github.nutt1101.command.Command;
-import com.github.nutt1101.command.TabComplete;
 import com.github.nutt1101.event.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
-import org.bukkit.command.PluginCommand;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -53,7 +52,13 @@ public class CatchBall extends JavaPlugin {
 
         plugin = this;
 
-        ConfigSetting.checkConfig();
+        try {
+            ConfigSetting.checkConfig();
+        } catch (IllegalArgumentException e) {
+            getLogger().severe("Could not load config.yml: " + e.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         Metrics metrics = new Metrics(this, 12380);
 
@@ -119,22 +124,17 @@ public class CatchBall extends JavaPlugin {
     public void registerEvent() {
         PluginManager registerEvent = this.getServer().getPluginManager();
         registerEvent.registerEvents(new HitEvent(), this);
-        if (ConfigSetting.DropEnable) {
-            registerEvent.registerEvents(new EntityDrop(), this);
-            registerEvent.registerEvents(new BlockDrop(), this);
-            registerEvent.registerEvents(new ChickenDrop(), this);
-        }
+        registerEvent.registerEvents(new EntityDrop(), this);
+        registerEvent.registerEvents(new BlockDrop(), this);
+        registerEvent.registerEvents(new ChickenDrop(), this);
         registerEvent.registerEvents(new SkullClick(), this);
         registerEvent.registerEvents(new GUIClick(), this);
     }
 
     // register command
     public void registerCommand() {
-        PluginCommand ctbCommand = this.getCommand("ctb");
-        if (ctbCommand != null) {
-            ctbCommand.setExecutor(new Command());
-            ctbCommand.setTabCompleter(new TabComplete());
-        }
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event ->
+                event.registrar().register("ctb", "CatchBall commands", new Command()));
     }
 
     public static String getServerVersion() {

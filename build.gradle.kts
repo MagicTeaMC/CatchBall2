@@ -62,7 +62,9 @@ dependencies {
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
     api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
-    api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
+    testImplementation("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
@@ -88,7 +90,7 @@ tasks.processResources {
     val props = mapOf("version" to version)
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
+    filesMatching("paper-plugin.yml") {
         expand(props)
     }
 }
@@ -122,3 +124,5 @@ tasks.runServer {
 }
 
 runPaper.folia.registerTask()
+
+tasks.test { useJUnitPlatform() }

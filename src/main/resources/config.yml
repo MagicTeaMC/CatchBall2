@@ -1,103 +1,78 @@
-# Some of the content has been relocated to the locale folder within the configuration file.
-# Discord: https://discord.gg/uQ4UXANnP2
-# GitHub: https://github.com/MagicTeaMC/CatchBall
+# CatchBall by MilkTeaMC and contributors
+# Matrix Support Chat: https://matrix.to/#/#maoyue-dev:matrix.org
 # Modrinth: https://modrinth.com/plugin/catchball
-# Latest config.yml: https://github.com/MagicTeaMC/CatchBall2/blob/release/src/main/resources/config.yml
+# Source code: https://github.com/MagicTeaMC/CatchBall2
+# Configuration changes are loaded with /ctb reload.
+# Legacy settings are migrated automatically; the original is saved as config.yml.bak.
+config-version: 2
 
-# Locale, Current support:
-# en(English), zh_tw(繁體中文_臺灣)
-# Help us to translate to other languages at Crowdin!
-# https://crowdin.com/project/catchball
-Locale: en
+messages:
+  # Language file in locale/: en, zh_tw, zh_cn, or a custom file name.
+  locale: en
 
-# Enable or disable drop item feature (This switch requires a server restart to take effect)
-DropEnable: true
-# Drop Item need permission (only works entity/block drop)
-DropNeedPermission: false
-# Drop Item chance
-# Warning: Changing this may cause previously dropped items to not be craftable into catchball
-DropItemChance: 50%
-# Drop Item Material
-DropItemMaterial: EGG
-# Can drop item method (CHICKEN/ENTITY/BLOCK)
-# CHICKEN: Chicken lays eggs
-# ENTITY: Entity death
-# BLOCK: Block break (Non-creative mode)
-DropMethod: CHICKEN
-# Drop entity or block type
-DropEntityType: CHICKEN
-DropBlockType: DIAMOND_ORE
-
-# Captured sound effects, No sound to type (false)
-# Sound Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
-CatchSuccessSound: ENTITY_ARROW_HIT_PLAYER
-
-# "AllowCatchableTamedOwnerIsNull" likely refers to the option of permitting players to capture tamed entities with a null owner, potentially affecting the entity capture mechanics by allowing acquisition of ownerless tamed entities.
-AllowCatchableTamedOwnerIsNull: true
-
-# Show particles if player catches entity.
-# This is an unstable feature, please report all bugs to our Discord or GitHub issues.
-ShowParticles: false
-
-# What particle do you want?
-# Particle Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html
-CustomParticles: CAMPFIRE_COSY_SMOKE
-
-# The probability (0-1) of a failed attempt to catch an entity. Set this value to 0 to disable this feature.
-# Setting it to 1 would mean every attempt to catch an entity would fail.
-# This is an unstable feature, please report all bugs to our Discord or GitHub issues.
-catchFailRate: 0.0
-
-# CatchBall on CraftRecipe
-Recipe:
-    # Whether to turn it on or off
-    enabled: true
-    # Recipe key
-    key:
-        # DROPITEM is the plugin provided custom item
-        # Item Support: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/material/package-summary.html
-        I: DROPITEM
-    # Recipe
-    shape:
-        - "III"
-        - "III"
-        - "III"
-
-# Disable if you don't want CatchBall check Residence flag
-UseRes: true
-# Catcher must have this permission flag to capture entity (depends on Plugin Residence)
-ResidenceFlag:
-    - animalkilling
-
-# Disable if you don't want CatchBall check GriefPrevention flag
-UseGF: true
-# Catcher must have this permission flag to capture entity (depends on Plugin GriefPrevention)
-GriefPreventionFlag:
-    - Access
-
-# Disable if you don't want CatchBall check Lands flag
-UseLands: true
-
-# Disable if you don't want CatchBall check RedProtect flag
-UseRP: true
-
-# Disable if you don't want CatchBall check SimpleClaimSystem flag
-UseSCS: true
-
-# Disable if you don't want CatchBall check Towny flag
-UseTowny: true
-
-# Disable if you don't want CatchBall to use PlaceholderAPI in messages
-UsePAPI: true
-
-# Disable if you don't want CatchBall check MythicMobs mobs
-UseMM: true
-
-CatchableEntity:
+capture:
+  # Entity names available on the running server. An empty list disables capture.
+  catchable-entities:
     - SHEEP
+  # Allow capturing a tamed entity whose owner is missing.
+  allow-ownerless-tamed: true
+  # Failure probability, from 0.0 (never fail) to 1.0 (always fail).
+  fail-rate: 0.0
+  # Bukkit sound name, or false to disable.
+  success-sound: ENTITY_ARROW_HIT_PLAYER
+  particles:
+    enabled: false
+    type: CAMPFIRE_COSY_SMOKE
 
-# If you have to custom item, you can change this to your want.
-# Set to 0 can disable it.
-# Never change it if you don't know what is this.
-customModelData: 0
-ballCustomModelData: 0
+drops:
+  enabled: true
+  # Permission requirement applies to ENTITY and BLOCK methods.
+  require-permission: false
+  # Percentage from 0 to 100. Legacy values such as "50%" are migrated.
+  chance: 50
+  material: EGG
+  # CHICKEN: egg laying; ENTITY: player kills; BLOCK: non-creative block breaks.
+  method: CHICKEN
+  entity-type: CHICKEN
+  block-type: DIAMOND_ORE
+
+items:
+  # 0 disables custom model data. Names and lore remain in locale/*.yml.
+  # Changing item appearance can prevent old items from matching exact recipes.
+  catch-ball:
+    custom-model-data: 0
+  drop-item:
+    custom-model-data: 0
+
+recipe:
+  enabled: true
+  # Each character maps to a material, a list of materials, or DROPITEM.
+  ingredients:
+    I: DROPITEM
+  # One to three rows of equal width, with one to three characters per row.
+  shape:
+    - "III"
+    - "III"
+    - "III"
+
+integrations:
+  residence:
+    enabled: true
+    flags:
+      - animalkilling
+  grief-prevention:
+    enabled: true
+    flags:
+      - Access
+  lands:
+    enabled: true
+  red-protect:
+    enabled: true
+  simple-claim-system:
+    enabled: true
+  towny:
+    enabled: true
+  placeholder-api:
+    enabled: true
+  mythic-mobs:
+    enabled: true

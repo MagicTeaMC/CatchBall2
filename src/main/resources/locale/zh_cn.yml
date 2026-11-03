@@ -56,3 +56,5 @@ DropSkullLore:
   - "&e捕获者：&a{PLAYER}"
   - "&e捕获时间：&a{TIME}"
   - "&e捕获地点： &a{LOCATION}"
+
+ReloadFailed: "&c配置重新加载失败：{REASON}"

@@ -71,3 +71,5 @@ DropSkullLore:
   - "&eThe Catcher: &a{PLAYER}"
   - "&eCapture Time: &a{TIME}"
   - "&eCapture Location: &a{LOCATION}"
+
+ReloadFailed: "&cConfiguration reload failed: {REASON}"

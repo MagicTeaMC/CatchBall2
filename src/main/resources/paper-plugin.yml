@@ -1,0 +1,56 @@
+name: CatchBall
+main: com.github.nutt1101.CatchBall
+authors: [NUTT1101, MagicTeaMC]
+description: "§bA plugin that make entity to be catchable.\n§dMatrix support: https://matrix.to/#/#maoyue-dev:matrix.org"
+version: ${version}
+api-version: '1.21.1'
+permissions:
+  catchball.op:
+    default: op
+  catchball.use:
+    default: true
+  catchball.get.entity:
+    default: false
+  catchball.get.block:
+    default: false
+folia-supported: true
+
+# Optional integrations must be enabled first and expose their API classes.
+dependencies:
+  server:
+    Residence:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    MythicMobs:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    GriefPrevention:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Lands:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    RedProtect:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    SimpleClaimSystem:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Towny:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    WorldGuard:
+      load: BEFORE
+      required: false
+      join-classpath: true

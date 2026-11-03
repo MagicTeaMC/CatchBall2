@@ -74,3 +74,5 @@ DropSkullLore:
   - "&e抓捕者: &a{PLAYER}"
   - "&e抓捕時間: &a{TIME}"
   - "&e抓捕地點: &a{LOCATION}"
+
+ReloadFailed: "&c設定重新載入失敗：{REASON}"

@@ -2,9 +2,7 @@ package com.github.nutt1101.command;
 
 import com.github.nutt1101.ConfigSetting;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.StringUtil;
 
@@ -13,91 +11,88 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class TabComplete implements TabCompleter {
+public class TabComplete {
     List<String> entityList = new ArrayList<>();
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> suggest(CommandSender sender, String[] args) {
 
         // tabComplete will be show suggest arument to commandSender
-        if (command.getName().equals("ctb")) {
-            final List<String> sort = new ArrayList<>();
+        final List<String> sort = new ArrayList<>();
 
-            if (!sender.hasPermission("catchball.op")) { return List.of(""); }
+        if (!sender.hasPermission("catchball.op")) { return List.of(); }
 
-            if (args.length == 1) {
-                StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument(), sort);
+        if (args.length == 1) {
+            StringUtil.copyPartialMatches(args[0], CommandCheck.getCommandArgument(), sort);
+            return sort;
+        }
+
+        if (args.length == 2) {
+            entityList.clear();
+            if (args[0].equalsIgnoreCase("give")) {
+                List<String> playerNames = new ArrayList<>();
+                Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
+
+                // search for player names
+                searchPlayerNames(args[1], playerNames, sort);
+                sort.sort(String.CASE_INSENSITIVE_ORDER);
+                return sort;
+            } else if (args[0].equalsIgnoreCase("add")) {
+                Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
+
+                // Use traditional for loop instead of streams for better compatibility
+                int availableToAdd = 0;
+                for (String entityName : allEntityList) {
+                    EntityType entityType = safeGetEntityType(entityName);
+                    if (entityType != null && !ConfigSetting.catchableEntity.contains(entityType.name())) {
+                        entityList.add(entityName);
+                        availableToAdd++;
+                    }
+                }
+
+                // Only show "ALL" if there are entities that can actually be added
+                if (availableToAdd > 1) {
+                    entityList.add("ALL");
+                }
+
+                StringUtil.copyPartialMatches(args[1], entityList, sort);
+                return sort;
+
+            } else if (args[0].equalsIgnoreCase("remove")) {
+
+                // Use traditional for loop instead of streams for better compatibility
+                Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
+                int availableToRemove = 0;
+                for (String entityName : allEntityList) {
+                    EntityType entityType = safeGetEntityType(entityName);
+                    if (entityType != null && ConfigSetting.catchableEntity.contains(entityType.name())) {
+                        entityList.add(entityName);
+                        availableToRemove++;
+                    }
+                }
+
+                // Only show "ALL" if there are entities that can actually be removed
+                if (availableToRemove > 0) {
+                    entityList.add("ALL");
+                }
+
+                StringUtil.copyPartialMatches(args[1], entityList, sort);
                 return sort;
             }
-
-            if (args.length == 2) {
-                entityList.clear();
-                if (args[0].equalsIgnoreCase("give")) {
-                    List<String> playerNames = new ArrayList<>();
-                    Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
-
-                    // search for player names
-                    searchPlayerNames(args[1], playerNames, sort);
-                    sort.sort(String.CASE_INSENSITIVE_ORDER);
-                    return sort;
-                } else if (args[0].equalsIgnoreCase("add")) {
-                    Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
-
-                    // Use traditional for loop instead of streams for better compatibility
-                    int availableToAdd = 0;
-                    for (String entityName : allEntityList) {
-                        EntityType entityType = safeGetEntityType(entityName);
-                        if (entityType != null && !ConfigSetting.catchableEntity.contains(entityType)) {
-                            entityList.add(entityName);
-                            availableToAdd++;
-                        }
-                    }
-
-                    // Only show "ALL" if there are entities that can actually be added
-                    if (availableToAdd > 1) {
-                        entityList.add("ALL");
-                    }
-
-                    StringUtil.copyPartialMatches(args[1], entityList, sort);
-                    return sort;
-
-                } else if (args[0].equalsIgnoreCase("remove")) {
-
-                    // Use traditional for loop instead of streams for better compatibility
-                    Set<String> allEntityList = ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false);
-                    int availableToRemove = 0;
-                    for (String entityName : allEntityList) {
-                        EntityType entityType = safeGetEntityType(entityName);
-                        if (entityType != null && ConfigSetting.catchableEntity.contains(entityType)) {
-                            entityList.add(entityName);
-                            availableToRemove++;
-                        }
-                    }
-
-                    // Only show "ALL" if there are entities that can actually be removed
-                    if (availableToRemove > 0) {
-                        entityList.add("ALL");
-                    }
-
-                    StringUtil.copyPartialMatches(args[1], entityList, sort);
-                    return sort;
-                }
-            } else if (args.length == 3) {
-                if (args[0].equalsIgnoreCase("give")) {
-                    StringUtil.copyPartialMatches(args[2], Arrays.asList("CatchBall", "DropItem"), sort);
-                    return sort;
-                }
-            } else if (args.length == 4) {
-                if (args[0].equalsIgnoreCase("give")) {
-                    StringUtil.copyPartialMatches(args[3], Arrays.asList(
-                            "1", "2", "3", "4", "5", "6", "7", "8", "9"
-                    ), sort);
-                    return sort;
-                }
+        } else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("give")) {
+                StringUtil.copyPartialMatches(args[2], Arrays.asList("CatchBall", "DropItem"), sort);
+                return sort;
+            }
+        } else if (args.length == 4) {
+            if (args[0].equalsIgnoreCase("give")) {
+                StringUtil.copyPartialMatches(args[3], Arrays.asList(
+                        "1", "2", "3", "4", "5", "6", "7", "8", "9"
+                ), sort);
+                return sort;
             }
         }
 
-        return List.of("");
+        return List.of();
     }
 
     /**

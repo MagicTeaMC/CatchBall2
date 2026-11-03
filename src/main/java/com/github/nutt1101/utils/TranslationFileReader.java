@@ -22,6 +22,7 @@ public class TranslationFileReader {
      public static String unknownCommandArgument;
      public static String successGetBall;
      public static String reloadSuccess;
+     public static String reloadFailed;
      public static String canNotCatchable;
      public static String ballHitBlock;
      public static String noPermissionToUse;
@@ -93,6 +94,7 @@ public class TranslationFileReader {
      }
 
      public static void load() {
+          reloadFailed = localeYamlConfig.getString("ReloadFailed", "&cConfiguration reload failed: {REASON}");
           localeYamlConfig = YamlConfiguration.loadConfiguration(new File(CatchBall.plugin.getDataFolder(), "locale/" + ConfigSetting.locale + ".yml"));
 
           if (CatchBall.plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") && ConfigSetting.UsePAPI) {
