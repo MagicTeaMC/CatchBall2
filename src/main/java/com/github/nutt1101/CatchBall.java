@@ -9,7 +9,8 @@ import net.momirealms.sparrow.ui.SparrowUI;
 import com.github.nutt1101.event.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -41,6 +42,7 @@ public class CatchBall extends JavaPlugin {
     public static LandsIntegration landsAPI;
     public static SimpleClaimSystemAPI scsAPI;
 
+    private Lamp<BukkitCommandActor> commands;
     private Metrics metrics;
     private EntitySelectionService selections;
     private CatchableMenu menus;
@@ -148,8 +150,7 @@ public class CatchBall extends JavaPlugin {
 
     // register command
     public void registerCommand() {
-        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event ->
-                event.registrar().register("ctb", "CatchBall commands", new Command()));
+        commands = Command.register(this);
     }
 
     public static String getServerVersion() {

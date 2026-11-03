@@ -15,6 +15,10 @@ public final class MenuText {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
     private MenuText() {}
 
+    public static String plain(String template) {
+        return net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(render(template, Map.of()));
+    }
+
     public static Component render(String template, Map<String, String> values) {
         String formatted = template.replace('§', '&');
         // Existing language files use legacy codes and {UPPER_CASE} placeholders.

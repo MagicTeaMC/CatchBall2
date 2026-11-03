@@ -10,6 +10,14 @@ permissions:
   catchball.command.list:
     description: Browse the catchable entity list
     default: true
+  catchball.command.reload:
+    default: op
+  catchball.command.add:
+    default: op
+  catchball.command.remove:
+    default: op
+  catchball.command.give:
+    default: op
   catchball.gui.edit:
     description: Edit the catchable entity list through the menu
     default: op

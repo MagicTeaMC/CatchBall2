@@ -1,128 +1,113 @@
 package com.github.nutt1101.command;
 
-import com.github.nutt1101.ConfigSetting;
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.nutt1101.CatchBall;
-import com.github.nutt1101.menu.MenuText;
-import java.io.IOException;
-import java.util.Map;
-import java.util.LinkedHashSet;
+import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.items.DropItem;
+import com.github.nutt1101.menu.MenuText;
 import com.github.nutt1101.utils.TranslationFileReader;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import io.papermc.paper.command.brigadier.BasicCommand;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
+import java.io.IOException;
+import java.lang.annotation.*;
+import java.util.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.annotation.*;
+import revxrsal.commands.autocomplete.SuggestionProvider;
+import revxrsal.commands.bukkit.BukkitLamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+@revxrsal.commands.annotation.Command({"ctb", "catchball"})
+public final class Command {
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface Access { String value(); }
 
-public class Command implements BasicCommand {
-    private final List<String> commandArgument = CommandCheck.getCommandArgument();
-    private final TabComplete tabComplete = new TabComplete();
-
-    @Override
-    public void execute(CommandSourceStack source, String[] args) {
-        handleCommand(source.getSender(), args);
+    public static Lamp<BukkitCommandActor> register(CatchBall plugin) {
+        Lamp<BukkitCommandActor> lamp = BukkitLamp.builder(plugin)
+                .permissionForAnnotation(Access.class, access -> actor ->
+                        actor.sender().hasPermission("catchball.op")
+                        || actor.sender().hasPermission("catchball.command." + access.value()))
+                .exceptionHandler(new CommandErrors())
+                .build();
+        lamp.register(new Command());
+        return lamp;
     }
 
-    @Override
-    public java.util.Collection<String> suggest(CommandSourceStack source, String[] args) {
-        return tabComplete.suggest(source.getSender(), args);
+    @revxrsal.commands.annotation.Command({"ctb", "catchball"})
+    public void help(BukkitCommandActor actor) {
+        reply(actor.sender(), TranslationFileReader.argDoesNotExist);
     }
 
-    private boolean handleCommand(CommandSender sender, String[] args) {
-        if (!(CommandCheck.check(sender, args))) {
-            return true;
+    @Subcommand("reload") @Access("reload")
+    public void reload(BukkitCommandActor actor) {
+        try {
+            ConfigSetting.checkConfig();
+            reply(actor.sender(), TranslationFileReader.reloadSuccess);
+        } catch (IllegalArgumentException error) {
+            actor.sender().sendMessage(MenuText.render(TranslationFileReader.reloadFailed,
+                    Map.of("reason", error.getMessage())));
         }
-
-        if (args[0].equalsIgnoreCase("reload")) {
-            try {
-                ConfigSetting.checkConfig();
-            } catch (IllegalArgumentException e) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadFailed, "", "")
-                        .replace("{REASON}", e.getMessage()));
-                return true;
-            }
-            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.reloadSuccess, "", ""));
-            return true;
-
-        } else if (args[0].equalsIgnoreCase("list")) {
-            if (!checkSenderPlayer(sender)) {
-                return true;
-            }
-
-            ((CatchBall) CatchBall.plugin).getMenus().open((Player) sender);
-
-        } else if (args[0].equalsIgnoreCase("add") || args[0].equalsIgnoreCase("remove")) {
-            editSelection(sender, args, args[0].equalsIgnoreCase("add"));
-            return true;
-        } else if (args[0].equalsIgnoreCase("give")) {
-            if (args.length < 3) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
-                return true;
-            }
-
-            Player player = Bukkit.getPlayer(args[1]);
-
-            if (player == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownOrOfflinePlayer, "", "")
-                        .replace("{PLAYER}", args[1]));
-                return true;
-            }
-
-            if (checkItem(args[2]) == null) {
-                sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.itemNameError, "", ""));
-                return true;
-            }
-
-            int itemAmount = 1;
-            if (args.length >= 4) {
-                try {
-                    itemAmount = Integer.parseInt(args[3]);
-                    if (itemAmount <= 0) {
-                        sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
-                        return true;
-                    }
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.invalidItemAmount, "", ""));
-                    return true;
-                }
-            }
-
-            givePlayerItem(player, checkItem(args[2]), itemAmount);
-
-            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.successGiveItemToPlayer, "", "")
-                    .replace("{ITEM}", args[2].equalsIgnoreCase("catchball") ? TranslationFileReader.catchBallName
-                            : TranslationFileReader.dropItemName)
-                    .replace("{PLAYER}", player.getName())
-                    .replace("&", "§"));
-
-            return true;
-
-        } else if (!commandArgument.contains(args[0])) {
-
-            // player entered an unknown argument
-            sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownCommandArgument, "", ""));
-            return true;
-        }
-
-        return true;
     }
 
-    private void editSelection(CommandSender sender, String[] args, boolean adding) {
-        if (args.length < 2) {
+    @Subcommand("list") @Access("list")
+    public void list(BukkitCommandActor actor) {
+        if (!actor.isPlayer()) {
+            reply(actor.sender(), TranslationFileReader.consoleExecuteCommand);
+            return;
+        }
+        ((CatchBall) CatchBall.plugin).getMenus().open(actor.requirePlayer());
+    }
+
+    @Subcommand("add") @Access("add")
+    public void add(BukkitCommandActor actor, @revxrsal.commands.annotation.Optional @SuggestWith(AddEntities.class) String entity) {
+        editSelection(actor.sender(), entity, true);
+    }
+
+    @Subcommand("remove") @Access("remove")
+    public void remove(BukkitCommandActor actor, @revxrsal.commands.annotation.Optional @SuggestWith(RemoveEntities.class) String entity) {
+        editSelection(actor.sender(), entity, false);
+    }
+
+    @Subcommand("give") @Access("give")
+    public void give(BukkitCommandActor actor, Player player,
+                     @Suggest({"CatchBall", "DropItem"}) String item,
+                     @Default("1") @Range(min = 1) int amount) {
+        if (!item.equalsIgnoreCase("catchball") && !item.equalsIgnoreCase("dropitem")) {
+            reply(actor.sender(), TranslationFileReader.itemNameError);
+            return;
+        }
+        // Inventory access belongs to the target player's region on Folia.
+        UniversalScheduler.getScheduler(CatchBall.plugin).runTask(player, () -> {
+            ItemStack stack = item.equalsIgnoreCase("catchball") ? Ball.makeBall() : DropItem.makeDropItem();
+            stack.setAmount(amount);
+            Map<Integer, ItemStack> remaining = player.getInventory().addItem(stack);
+            if (!remaining.isEmpty()) {
+                reply(player, TranslationFileReader.playerInventoryFull);
+                remaining.values().forEach(leftover -> player.getWorld().dropItem(player.getLocation(), leftover));
+            }
+            actor.sender().sendMessage(MenuText.render(TranslationFileReader.successGiveItemToPlayer,
+                    Map.of("item", MenuText.plain(item.equalsIgnoreCase("catchball")
+                            ? TranslationFileReader.catchBallName : TranslationFileReader.dropItemName),
+                            "player", player.getName())));
+        });
+    }
+
+    private static void reply(CommandSender sender, String message) {
+        sender.sendMessage(MenuText.render(message, Map.of()));
+    }
+
+    private void editSelection(CommandSender sender, String entity, boolean adding) {
+        if (entity == null) {
             sender.sendMessage(ConfigSetting.toChat(adding ? TranslationFileReader.addEntityDoesNotExist
                     : TranslationFileReader.removeEntityDoesNotExist, "", ""));
             return;
         }
         Set<String> targets = new LinkedHashSet<>();
-        boolean all = args[1].equalsIgnoreCase("all");
+        boolean all = entity.equalsIgnoreCase("all");
         if (all) {
             if (adding) {
                 for (String name : ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false)) {
@@ -130,7 +115,7 @@ public class Command implements BasicCommand {
                 }
             }
         } else {
-            String name = findMatchingEntity(args[1]);
+            String name = findMatchingEntity(entity);
             if (name == null || safeGetEntityType(name) == null) {
                 sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.unknownEntityType, "", ""));
                 return;
@@ -174,41 +159,39 @@ public class Command implements BasicCommand {
      * @return Matching entity name from config, or null if not found
      */
     private String findMatchingEntity(String inputEntity) {
-        for (String entity : ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false)) {
-            if (entity.equalsIgnoreCase(inputEntity)) {
-                return entity;
+        for (String name : ConfigSetting.entityFile.getConfigurationSection("EntityList").getKeys(false)) {
+            if (name.equalsIgnoreCase(inputEntity)) {
+                return name;
             }
         }
         return null;
     }
 
-    private ItemStack checkItem(String item) {
-        item = item.toLowerCase();
-        if (item.equals("catchball")) {
-            return Ball.makeBall();
+
+    public static final class AddEntities implements SuggestionProvider<BukkitCommandActor> {
+        public Collection<String> getSuggestions(revxrsal.commands.node.ExecutionContext<BukkitCommandActor> context) {
+            return entitySuggestions(true);
         }
-        if (item.equals("dropitem")) {
-            return DropItem.makeDropItem();
-        }
-        return null;
     }
 
-    private Boolean checkSenderPlayer(CommandSender sender) {
-        if (sender instanceof Player) {
-            return true;
+    public static final class RemoveEntities implements SuggestionProvider<BukkitCommandActor> {
+        public Collection<String> getSuggestions(revxrsal.commands.node.ExecutionContext<BukkitCommandActor> context) {
+            return entitySuggestions(false);
         }
-        sender.sendMessage(ConfigSetting.toChat(TranslationFileReader.consoleExecuteCommand, "", ""));
-        return false;
     }
 
-    private void givePlayerItem(Player player, ItemStack itemStack, int amount) {
-        if (player.getInventory().firstEmpty() == -1) {
-            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.playerInventoryFull, "", ""));
-            player.getWorld().dropItem(player.getLocation(), itemStack);
-        } else {
-            ItemStack item = itemStack.clone();
-            item.setAmount(amount);
-            player.getInventory().addItem(item);
-        }
+    private static List<String> entitySuggestions(boolean adding) {
+        var section = ConfigSetting.entityFile.getConfigurationSection("EntityList");
+        if (section == null) return List.of();
+        List<String> selected = ConfigSetting.catchableEntity;
+        List<String> values = section.getKeys(false).stream()
+                .filter(name -> {
+                    try { EntityType.valueOf(name); return true; }
+                    catch (IllegalArgumentException ignored) { return false; }
+                })
+                .filter(name -> selected.contains(name) != adding)
+                .sorted().collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        if (!values.isEmpty()) values.add("ALL");
+        return values;
     }
 }

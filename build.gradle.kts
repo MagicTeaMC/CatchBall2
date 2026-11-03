@@ -66,6 +66,8 @@ repositories {
 
 dependencies {
     implementation("net.momirealms:sparrow-ui:beta.38")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.18")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.18")
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
     implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
@@ -90,6 +92,7 @@ val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
         options.release.set(targetJavaVersion)
+        options.compilerArgs.add("-parameters")
     }
 }
 
@@ -116,13 +119,14 @@ tasks {
         minimize {
             // Sparrow loads proxy classes and resources reflectively.
             exclude(dependency("net.momirealms:sparrow-ui:.*"))
+            exclude(dependency("io.github.revxrsal:.*:.*"))
             exclude(dependency("com.github.Anon8281:UniversalScheduler:.*"))
         }
 
         relocate("com.github.Anon8281.universalScheduler", "tw.maoyue.catchball.libs.scheduler")
         relocate("net.momirealms.sparrow.ui", "tw.maoyue.catchball.libs.sparrow.ui")
 
-        relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
+        relocate("revxrsal.commands", "tw.maoyue.catchball.libs.lamp")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
         relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 
