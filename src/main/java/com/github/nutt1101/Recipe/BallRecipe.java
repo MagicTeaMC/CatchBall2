@@ -5,54 +5,39 @@ import com.github.nutt1101.ConfigSetting;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.items.DropItem;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import com.github.nutt1101.utils.GameTypes;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.FileConfiguration;
+import dev.dejvokep.boostedyaml.YamlDocument;
+import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.plugin.Plugin;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 public class BallRecipe {
-    private final Plugin plugin = CatchBall.plugin;
-
-    // load from config.yml and add catchBall Recipe
     public BallRecipe() {
-        if (ConfigSetting.recipeEnabled) {
-            NamespacedKey ballKey = new NamespacedKey(plugin, "ballKey");
-            ShapedRecipe ballRecipe = new ShapedRecipe(ballKey, Ball.makeBall());
-            
-            FileConfiguration config = plugin.getConfig(); 
-            
-            // load from yml file
-            
-            Set<String> recipePath = config.getConfigurationSection("Recipe.key").getKeys(false);            
-            
-            ballRecipe.shape(config.getStringList("Recipe.shape").toArray(new String[3]));
-
-            for (String key : recipePath) {
-                String ItemName = config.getString("Recipe.key." + key).toUpperCase();
-                if (ItemName instanceof String) {
-                    if (ItemName.equals("DROPITEM")) {
-                        ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
-                    } else {
-                        ballRecipe.setIngredient(key.charAt(0), Material.valueOf(ItemName));
-                    }
-
-                } else {
-                    ballRecipe.setIngredient(key.charAt(0), new RecipeChoice.MaterialChoice(
-                        config.getStringList("Recipe.key." + key).stream().map(
-                        list -> Material.valueOf(list)).collect(Collectors.toList())));
-                }
-                
-            }
-            
-            if (Bukkit.getRecipe(ballKey) != null) { Bukkit.removeRecipe(ballKey); }
-            
-            Bukkit.addRecipe(ballRecipe);
+        NamespacedKey key = new NamespacedKey(CatchBall.plugin, "ballKey");
+        if (!ConfigSetting.recipeEnabled) {
+            Bukkit.removeRecipe(key);
+            return;
         }
+        YamlDocument config = ConfigSetting.configuration();
+        ShapedRecipe recipe = new ShapedRecipe(key, Ball.makeBall());
+        recipe.shape(config.getStringList("recipe.shape").toArray(String[]::new));
+        Section ingredients = config.getSection("recipe.ingredients");
+        for (String symbol : ingredients.getRoutesAsStrings(false)) {
+            Object ingredient = ingredients.get(symbol);
+            if (ingredient instanceof String name) {
+                if (name.equalsIgnoreCase("DROPITEM")) {
+                    recipe.setIngredient(symbol.charAt(0), new RecipeChoice.ExactChoice(DropItem.makeDropItem()));
+                } else {
+                    recipe.setIngredient(symbol.charAt(0), GameTypes.material(name));
+                }
+            } else {
+                recipe.setIngredient(symbol.charAt(0), new RecipeChoice.MaterialChoice(
+                        ingredients.getStringList(symbol).stream().map(GameTypes::material).toList()));
+            }
+        }
+        Bukkit.removeRecipe(key);
+        Bukkit.addRecipe(recipe);
     }
 }

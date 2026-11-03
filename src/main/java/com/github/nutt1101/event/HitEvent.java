@@ -7,6 +7,7 @@ import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.github.nutt1101.CatchBall;
 import com.github.nutt1101.ConfigSetting;
+import com.github.nutt1101.utils.GameTypes;
 import com.github.nutt1101.HeadDrop;
 import com.github.nutt1101.items.Ball;
 import com.github.nutt1101.utils.NBTHandler;
@@ -34,7 +35,6 @@ import java.util.Objects;
 
 
 public class HitEvent implements Listener {
-    private List<String> catchableEntity = ConfigSetting.catchableEntity; // Changed from EntityType to String
     private Location hitLocation;
     private final Plugin plugin = CatchBall.plugin;
     private final String[] mmPackage = {"io.lumine.mythic.bukkit.BukkitAPIHelper", "io.lumine.xikage.mythicmobs.api.bukkit.BukkitAPIHelper"};
@@ -44,7 +44,7 @@ public class HitEvent implements Listener {
      */
     private boolean isEntityCatchable(EntityType entityType) {
         String entityName = entityType.name();
-        return catchableEntity.contains(entityName);
+        return ConfigSetting.catchableEntity.contains(entityName);
     }
 
     @EventHandler
@@ -55,9 +55,9 @@ public class HitEvent implements Listener {
             if (!checkCatchBall(event.getEntity())) { return; }
 
             if (!player.hasPermission("catchball.use")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
                         getCoordinate(event.getHitBlock() == null ? Objects.requireNonNull(event.getHitEntity()).getLocation() : event.getHitBlock().getLocation())
-                        , "").replace("{BALL}", TranslationFileReader.catchBallName)));
+                        , ""));
 
                 event.getEntity().remove();
 
@@ -132,8 +132,8 @@ public class HitEvent implements Listener {
 
         // Check permissions
         if (!player.hasPermission("catchball.use")) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
-                    getCoordinate(targetEntity.getLocation()), "").replace("{BALL}", TranslationFileReader.catchBallName)));
+            player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noPermissionToUse,
+                    getCoordinate(targetEntity.getLocation()), ""));
             return;
         }
 
@@ -240,7 +240,7 @@ public class HitEvent implements Listener {
 
             // Success sound
             if (!(ConfigSetting.catchSuccessSound.equals("FALSE"))) {
-                player.playSound(player.getLocation(), Sound.valueOf(ConfigSetting.catchSuccessSound), 1f, 1f);
+                player.playSound(player.getLocation(), GameTypes.sound(ConfigSetting.catchSuccessSound), 1f, 1f);
             }
 
             // Remove the entity and drop the head
@@ -249,7 +249,7 @@ public class HitEvent implements Listener {
 
             // Show particles
             if (ConfigSetting.ShowParticles) {
-                hitEntity.getWorld().spawnParticle(Particle.valueOf(ConfigSetting.CustomParticles), hitLocation, 1);
+                hitEntity.getWorld().spawnParticle(GameTypes.particle(ConfigSetting.CustomParticles), hitLocation, 1);
             }
 
             player.sendMessage(ConfigSetting.toChat(TranslationFileReader.catchSuccess, getCoordinate(hitLocation), hitEntity.getType().name()));
@@ -293,8 +293,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.residenceFlag) {
             if (!residence.getPermissions().playerHas(player, Flags.valueOf(flags.toLowerCase()) , true)) {
 
-                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "").
-                        replace("{FLAG}", flags));
+                player.sendMessage(ConfigSetting.toChat(TranslationFileReader.noResidencePermissions, "", "", java.util.Map.of("flag", flags)));
 
                 return false;
             }
@@ -354,8 +353,7 @@ public class HitEvent implements Listener {
         for (String flags : ConfigSetting.griefPreventionFlag) {
             if (!claim.hasExplicitPermission(player, ClaimPermission.valueOf(flags))) {
                 player.sendMessage(ConfigSetting.toChat(
-                                TranslationFileReader.noResidencePermissions, "", "")
-                        .replace("{FLAG}", flags));
+                                TranslationFileReader.noResidencePermissions, "", "", java.util.Map.of("flag", flags)));
 
                 return false;
             }

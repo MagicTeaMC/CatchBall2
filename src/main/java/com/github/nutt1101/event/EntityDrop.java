@@ -15,7 +15,7 @@ public class EntityDrop implements Listener{
     @EventHandler
     public void onEntityDrop(EntityDeathEvent event) {
         // Check config setting drop method
-        if (ConfigSetting.DropMethod != ConfigSetting.DropMethodType.ENTITY) {
+        if (!ConfigSetting.DropEnable || ConfigSetting.DropMethod != ConfigSetting.DropMethodType.ENTITY) {
             return;
         }
         // Check player kill entity
@@ -30,9 +30,8 @@ public class EntityDrop implements Listener{
             }
         }
 
-        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
-        if (event.getEntityType().equals(ConfigSetting.DropEntityType)) {
-            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
+        if (event.getEntityType().name().equals(ConfigSetting.DropEntityType)) {
+            if (chance.nextInt(100) < ConfigSetting.DropItemChance) {
                 event.getDrops().clear();
                 event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), DropItem.makeDropItem());
             }

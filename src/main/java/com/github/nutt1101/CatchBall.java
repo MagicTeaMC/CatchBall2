@@ -1,13 +1,16 @@
 package com.github.nutt1101;
 
-import cn.handyplus.lib.adapter.HandySchedulerUtil;
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.github.nutt1101.command.Command;
-import com.github.nutt1101.command.TabComplete;
+import com.github.nutt1101.menu.CatchableMenu;
+import com.github.nutt1101.service.EntitySelectionService;
+import net.momirealms.sparrow.ui.SparrowUI;
 import com.github.nutt1101.event.*;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,7 +22,6 @@ import fr.xyness.SCS.API.SimpleClaimSystemAPI_Provider;
 import java.util.logging.Level;
 
 public class CatchBall extends JavaPlugin {
-    private FileConfiguration config = this.getConfig();
 
     public static Plugin plugin;
 
@@ -38,7 +40,14 @@ public class CatchBall extends JavaPlugin {
     public static LandsIntegration landsAPI;
     public static SimpleClaimSystemAPI scsAPI;
 
+    private Lamp<BukkitCommandActor> commands;
     private Metrics metrics;
+    private EntitySelectionService selections;
+    private CatchableMenu menus;
+    private TaskScheduler scheduler;
+
+    public CatchableMenu getMenus() { return menus; }
+    public EntitySelectionService getSelections() { return selections; }
 
     private boolean checkAndInitializePlugin(String pluginName) {
         boolean hasPlugin = this.getServer().getPluginManager().getPlugin(pluginName) != null;
@@ -52,10 +61,23 @@ public class CatchBall extends JavaPlugin {
     public void onEnable() {
 
         plugin = this;
+        scheduler = UniversalScheduler.getScheduler(this);
 
-        ConfigSetting.checkConfig();
+        try {
+            ConfigSetting.checkConfig();
+        } catch (IllegalArgumentException e) {
+            getLogger().severe("Could not load config.yml: " + e.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-        Metrics metrics = new Metrics(this, 12380);
+        metrics = new Metrics(this, 12380);
+        selections = new EntitySelectionService(ConfigSetting.class,
+                () -> new java.util.HashSet<>(ConfigSetting.catchableEntity),
+                ConfigSetting::persistEntityList,
+                () -> { if (menus != null) menus.refreshSelection(); });
+        SparrowUI.getInstance().setUp(this);
+        menus = new CatchableMenu(this, selections);
 
         // Initialize plugin availability flags and APIs
         initializePluginIntegrations();
@@ -63,8 +85,6 @@ public class CatchBall extends JavaPlugin {
         registerEvent();
         registerCommand();
 
-
-        HandySchedulerUtil.init(this);
     }
 
     private void initializePluginIntegrations() {
@@ -106,35 +126,30 @@ public class CatchBall extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (menus != null) menus.close();
+        if (commands != null) commands.unregisterAllCommands();
         // Shutdown metrics
         if (metrics != null) {
             metrics.shutdown();
         }
 
         // Cancel all tasks registered by this plugin
-        getServer().getScheduler().cancelTasks(this);
+        if (scheduler != null) scheduler.cancelTasks();
     }
 
     // register event
     public void registerEvent() {
         PluginManager registerEvent = this.getServer().getPluginManager();
         registerEvent.registerEvents(new HitEvent(), this);
-        if (ConfigSetting.DropEnable) {
-            registerEvent.registerEvents(new EntityDrop(), this);
-            registerEvent.registerEvents(new BlockDrop(), this);
-            registerEvent.registerEvents(new ChickenDrop(), this);
-        }
+        registerEvent.registerEvents(new EntityDrop(), this);
+        registerEvent.registerEvents(new BlockDrop(), this);
+        registerEvent.registerEvents(new ChickenDrop(), this);
         registerEvent.registerEvents(new SkullClick(), this);
-        registerEvent.registerEvents(new GUIClick(), this);
     }
 
     // register command
     public void registerCommand() {
-        PluginCommand ctbCommand = this.getCommand("ctb");
-        if (ctbCommand != null) {
-            ctbCommand.setExecutor(new Command());
-            ctbCommand.setTabCompleter(new TabComplete());
-        }
+        commands = Command.register(this);
     }
 
     public static String getServerVersion() {

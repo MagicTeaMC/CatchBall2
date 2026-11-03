@@ -15,7 +15,7 @@ public class BlockDrop implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         // Check config setting drop method
-        if (ConfigSetting.DropMethod != ConfigSetting.DropMethodType.BLOCK) {
+        if (!ConfigSetting.DropEnable || ConfigSetting.DropMethod != ConfigSetting.DropMethodType.BLOCK) {
             return;
         }
         // Check player permission
@@ -31,10 +31,9 @@ public class BlockDrop implements Listener {
             return;
         }
 
-        ConfigSetting.DropItemChance = Math.min(ConfigSetting.DropItemChance, 100);
 
         if (event.getBlock().getType() == ConfigSetting.DropBlockType) {
-            if (chance.nextInt(99) < ConfigSetting.DropItemChance) {
+            if (chance.nextInt(100) < ConfigSetting.DropItemChance) {
                 event.setDropItems(false);
                 event.getBlock().getWorld().dropItem(event.getBlock().getLocation(), DropItem.makeDropItem());
             }

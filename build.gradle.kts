@@ -15,6 +15,12 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 repositories {
     mavenLocal()
     mavenCentral()
+    exclusiveContent {
+        forRepository { maven { url = uri("https://repo.papermc.io/repository/maven-public/") } }
+        filter { includeGroup("io.papermc.paper") }
+    }
+    maven("https://libraries.minecraft.net") { content { includeGroup("com.mojang") } }
+    maven("https://repo.momirealms.net/snapshots")
     maven {
         url = uri("https://repo.destroystokyo.com/repository/maven-public/")
     }
@@ -59,11 +65,18 @@ repositories {
 }
 
 dependencies {
+    implementation("net.momirealms:sparrow-ui:beta.38")
+    implementation("io.github.revxrsal:lamp.common:4.0.0-rc.18")
+    implementation("io.github.revxrsal:lamp.bukkit:4.0.0-rc.18")
+    implementation("dev.dejvokep:boosted-yaml:1.3.7")
+    implementation("com.github.cryptomorin:XSeries:14.0.0")
     api("org.bstats:bstats-bukkit:3.1.0")
     api("de.tr7zw:item-nbt-api:2.16.0")
-    api("cn.handyplus.lib.adapter:FoliaLib:1.2.1")
-    api("com.tchristofferson:ConfigUpdater:2.2-SNAPSHOT")
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    implementation("com.github.Anon8281:UniversalScheduler:0.1.7")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
+    testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.9.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
@@ -81,6 +94,7 @@ val targetJavaVersion = 21
 tasks.withType<JavaCompile>().configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
         options.release.set(targetJavaVersion)
+        options.compilerArgs.add("-parameters")
     }
 }
 
@@ -88,7 +102,7 @@ tasks.processResources {
     val props = mapOf("version" to version)
     inputs.properties(props)
     filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
+    filesMatching("paper-plugin.yml") {
         expand(props)
     }
 }
@@ -104,9 +118,20 @@ tasks {
 
         configurations = listOf(project.configurations.runtimeClasspath.get())
 
-        minimize()
+        minimize {
+            // Sparrow loads proxy classes and resources reflectively.
+            exclude(dependency("net.momirealms:sparrow-ui:.*"))
+            exclude(dependency("io.github.revxrsal:.*:.*"))
+            exclude(dependency("com.github.cryptomorin:XSeries:.*"))
+            exclude(dependency("com.github.Anon8281:UniversalScheduler:.*"))
+        }
 
-        relocate("com.jeff_media.updatechecker", "tw.maoyue.catchball.libs.updatechecker")
+        relocate("com.github.Anon8281.universalScheduler", "tw.maoyue.catchball.libs.scheduler")
+        relocate("net.momirealms.sparrow.ui", "tw.maoyue.catchball.libs.sparrow.ui")
+
+        relocate("revxrsal.commands", "tw.maoyue.catchball.libs.lamp")
+        relocate("dev.dejvokep.boostedyaml", "tw.maoyue.catchball.libs.boostedyaml")
+        relocate("com.cryptomorin.xseries", "tw.maoyue.catchball.libs.xseries")
         relocate("de.tr7zw.changeme.nbtapi", "tw.maoyue.catchball.libs.nbtapi")
         relocate("org.bstats", "tw.maoyue.catchball.libs.bstats")
 
@@ -122,3 +147,5 @@ tasks.runServer {
 }
 
 runPaper.folia.registerTask()
+
+tasks.test { useJUnitPlatform() }
